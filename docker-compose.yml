@@ -8,12 +8,14 @@ services:
     volumes:
       - ./shared/prisma:/app/shared/prisma
     working_dir: /app/shared/prisma
-    command: |+
+    command: |
       sh -c "
         bunx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
         bunx prisma generate --schema=/app/shared/prisma/schema.prisma
       "
-        
+    networks:
+      - snehaa-network
+
   api:
     build:
       context: .
@@ -33,6 +35,8 @@ services:
     volumes:
       - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
   smtp:
     build:
@@ -54,6 +58,8 @@ services:
     volumes:
       - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
   ui:
     build:
@@ -68,6 +74,8 @@ services:
       migrate:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
   caddy:
     image: caddy:2-alpine

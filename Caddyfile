@@ -19,7 +19,7 @@ web.snehaa.store {
 
 	# UI routes - fallback
 	handle /* {
-		reverse_proxy ui:5173
+		reverse_proxy ui:3000
 	}
 
 	# Headers
