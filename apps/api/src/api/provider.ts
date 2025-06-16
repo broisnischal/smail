@@ -9,9 +9,9 @@ const provider = new Elysia({})
     oauth2(
       {
         Google: [
-          "368826759806-rglob2arlkv1cfiqbg99bocltqsgbkjs.apps.googleusercontent.com",
-          "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",
-          "http://localhost:3000/auth/google/callback",
+          "368826759806-el8ladlf4l74d04gem98jm5ef0ecdm01.apps.googleusercontent.com",
+          "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",
+          "https://a.aitchomes.com/auth/google/callback",
         ],
       },
       {

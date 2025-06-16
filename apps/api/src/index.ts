@@ -29,8 +29,22 @@ const app = new Elysia()
 
     return { user };
   })
-  .get("/me", ({ user }) => {
-    return user;
+  .get("/me", async ({ user, db }) => {
+
+    const alias = await db.emailAlias.findMany({
+      where: {
+        email: {
+          every: {
+            address: user.email
+          }
+        }
+      }
+    })
+
+    return {
+      alias,
+      user
+    };
   })
   .listen(3000);
 
