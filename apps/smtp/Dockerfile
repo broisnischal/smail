@@ -1,17 +1,21 @@
-# Use the Bun image as the base image
-FROM oven/bun:latest
+FROM oven/bun:1 as base
+WORKDIR /usr/src/app
 
-# Set the working directory in the container
-WORKDIR /app
+# Copy root package files
+COPY package.json bun.lock ./
+COPY apps/smtp/package.json apps/smtp/bun.lock* ./apps/smtp/
 
-# Copy the current directory contents into the container at /app
-COPY . .
+# Install root dependencies
+RUN bun install --frozen-lockfile
 
-# Install dependencies
-RUN bun install
+# Install SMTP dependencies
+WORKDIR /usr/src/app/apps/smtp
+RUN bun install --frozen-lockfile
 
-# Expose the port on which the API will listen
-EXPOSE 25
+# Copy SMTP source code
+COPY apps/smtp/index.ts ./
 
-# Run the server when the container launches
+WORKDIR /usr/src/app/apps/smtp
+
+EXPOSE 2525
 CMD ["bun", "run", "index.ts"]

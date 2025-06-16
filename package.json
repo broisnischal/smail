@@ -1,9 +1,26 @@
 {
+  "imports": {
+    "#*": "./*"
+  },
+  "scripts": {
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "db:migrate": "docker-compose run --rm migrate bunx prisma migrate deploy",
+    "db:seed": "docker-compose run --rm migrate bunx prisma db seed",
+    "db:reset": "docker-compose run --rm migrate bunx prisma migrate reset --force"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
+  },
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "@types/mailparser": "^3.4.6",
     "@types/nodemailer": "^6.4.17",
     "mailparser": "^3.7.3",
+    "nodemailer": "^7.0.3",
     "smtp-server": "^3.13.8"
   },
   "devDependencies": {

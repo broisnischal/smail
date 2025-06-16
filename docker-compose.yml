@@ -1,33 +1,74 @@
+
 services:
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Migration service
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: |
+      sh -c "
+        echo 'Running migrations...' &&
+        bunx prisma migrate deploy &&
+        echo 'Seeding database...' &&
+        bun run prisma/seed.ts
+      "
+
+  # API service
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # SMTP service
   smtp:
+    build:
+      context: .
+      dockerfile: apps/smtp/Dockerfile
+    environment:
+      SMTP_PORT: 2525
+    ports:
+      - "2525:2525"
+    restart: unless-stopped
 
-    #   postgres:
-    #     image: postgres:15
-    #     environment:
-    #       POSTGRES_DB: email_forwarding
-    #       POSTGRES_USER: postgres
-    #       POSTGRES_PASSWORD: password
-    #     ports:
-    #       - "5432:5432"
-    #     volumes:
-    #       - postgres_data:/var/lib/postgresql/data
+  # UI service
+  # ui:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/ui/Dockerfile
+  #   ports:
+  #     - "5173:5173"
+  #   restart: unless-stopped
 
-    #   rabbitmq:
-    #     image: rabbitmq:3-management
-    #     environment:
-    #       RABBITMQ_DEFAULT_USER: admin
-    #       RABBITMQ_DEFAULT_PASS: password
-    #     ports:
-    #       - "5672:5672"
-    #       - "15672:15672"
-    #     volumes:
-    #       - rabbitmq_data:/var/lib/rabbitmq
-
-    #   redis:
-    #     image: redis:7-alpine
-    #     ports:
-    #       - "6379:6379"
-
-    # volumes:
-    #   postgres_data:
-    #   rabbitmq_data:
+volumes:
+  postgres_data:
