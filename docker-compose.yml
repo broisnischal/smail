@@ -18,7 +18,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    env_file: ./apps/api/.env
+    env_file:
+      - .env
+    environment:
+      CLIENT_URL: "http://localhost"
     ports:
       - "3000:3000"
     depends_on:
@@ -51,6 +54,8 @@ services:
     build:
       context: .
       dockerfile: apps/ui/Dockerfile.node
+    environment:
+      API_URL: "http://api:3000/api"
     ports:
       - "5173:3000"
     depends_on:
@@ -62,14 +67,10 @@ services:
     image: caddy:2-alpine
     ports:
       - "80:80"
-      - "443:443"
     volumes:
-      # use prod 
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    environment:
-      - DOMAIN=${DOMAIN:-localhost}
     depends_on:
       - api
       - ui

@@ -12,7 +12,7 @@ const provider = new Elysia({})
         Google: [
           "368826759806-rglob2arlkv1cfiqbg99bocltqsgbkjs.apps.googleusercontent.com",
           "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",
-          `${process.env.API_URL}/auth/google/callback`,
+          `http://localhost:3000/auth/google/callback`,
         ],
       },
       {
@@ -102,7 +102,7 @@ const provider = new Elysia({})
       );
 
       token.set({
-        domain: process.env.CLIENT_URL!,
+        domain: 'localhost',
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
         path: "/",
@@ -111,7 +111,7 @@ const provider = new Elysia({})
         value: appToken,
       });
 
-      return redirect(`${process.env.CLIENT_URL}/`);
+      return redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/`);
     },
   );
 

@@ -39,7 +39,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action() {
-  return redirect("http://localhost:3000/auth/google");
+  return redirect(`${process.env.API_URL || 'http://localhost:3000/api'}/auth/google`);
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {

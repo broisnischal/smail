@@ -9,8 +9,8 @@ type AppTokenPayload = JwtPayload & {
   provider: string;
 };
 
-const app = new Elysia().use(cors({
-  origin: [process.env.CLIENT_URL!],
+const app = new Elysia({ prefix: "/api" }).use(cors({
+  origin: ["http://localhost:5173", "http://localhost:3000"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 }))
@@ -25,28 +25,37 @@ const app = new Elysia().use(cors({
   })
   .use(provider)
 
+  .get("/health", () => {
+    return { status: "ok", message: "API is running" };
+  })
+
   .derive(async ({ cookie, db }) => {
     const token = cookie["token"];
 
+    if (!token || !token.cookie) {
+      return { user: null };
+    }
 
-    if (!token || !token.cookie) throw new Error("Unauthorized");
+    try {
+      const decoded = verify(
+        token.cookie.value as string,
+        process.env.JWT_SECRET!,
+      ) as unknown as AppTokenPayload;
 
-    const decoded = verify(
-      token.cookie.value as string,
-      process.env.JWT_SECRET!,
-    ) as unknown as AppTokenPayload;
+      const user = await db.user.findUnique({
+        where: { id: decoded.sub },
+      });
 
-
-
-    const user = await db.user.findUnique({
-      where: { id: decoded.sub },
-    });
-
-    if (!user) throw new Error("Unauthorized");
-
-    return { user };
+      return { user };
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      return { user: null };
+    }
   })
   .get("/me", async ({ user, db }) => {
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
 
     const alias = await db.emailAlias.findMany({
       where: {
@@ -55,7 +64,6 @@ const app = new Elysia().use(cors({
             address: user.email
           }
         },
-
       },
       select: {
         alias: true,

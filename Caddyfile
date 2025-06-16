@@ -1,13 +1,18 @@
-# Development configuration
-localhost {
-	# UI routes
-	handle /* {
-		reverse_proxy ui:5173
-	}
+# Global settings
+{
+	auto_https off
+}
 
-	# API routes
+# Development configuration
+http://localhost:80 {
+	# API routes - handle all /api/* requests
 	handle /api/* {
 		reverse_proxy api:3000
+	}
+
+	# UI routes - handle everything else
+	handle /* {
+		reverse_proxy ui:3000
 	}
 }
 
