@@ -6196,6 +6196,7 @@ export namespace Prisma {
   export type EmailAliasMinAggregateOutputType = {
     id: string | null
     alias: string | null
+    domain: string | null
     userId: string | null
     isActive: boolean | null
     emailCount: number | null
@@ -6207,6 +6208,7 @@ export namespace Prisma {
   export type EmailAliasMaxAggregateOutputType = {
     id: string | null
     alias: string | null
+    domain: string | null
     userId: string | null
     isActive: boolean | null
     emailCount: number | null
@@ -6218,6 +6220,7 @@ export namespace Prisma {
   export type EmailAliasCountAggregateOutputType = {
     id: number
     alias: number
+    domain: number
     userId: number
     isActive: number
     emailCount: number
@@ -6239,6 +6242,7 @@ export namespace Prisma {
   export type EmailAliasMinAggregateInputType = {
     id?: true
     alias?: true
+    domain?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6250,6 +6254,7 @@ export namespace Prisma {
   export type EmailAliasMaxAggregateInputType = {
     id?: true
     alias?: true
+    domain?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6261,6 +6266,7 @@ export namespace Prisma {
   export type EmailAliasCountAggregateInputType = {
     id?: true
     alias?: true
+    domain?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6359,6 +6365,7 @@ export namespace Prisma {
   export type EmailAliasGroupByOutputType = {
     id: string
     alias: string
+    domain: string
     userId: string
     isActive: boolean
     emailCount: number
@@ -6389,6 +6396,7 @@ export namespace Prisma {
   export type EmailAliasSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     alias?: boolean
+    domain?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6404,6 +6412,7 @@ export namespace Prisma {
   export type EmailAliasSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     alias?: boolean
+    domain?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6416,6 +6425,7 @@ export namespace Prisma {
   export type EmailAliasSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     alias?: boolean
+    domain?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6428,6 +6438,7 @@ export namespace Prisma {
   export type EmailAliasSelectScalar = {
     id?: boolean
     alias?: boolean
+    domain?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6436,7 +6447,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type EmailAliasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "alias" | "userId" | "isActive" | "emailCount" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAlias"]>
+  export type EmailAliasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "alias" | "domain" | "userId" | "isActive" | "emailCount" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAlias"]>
   export type EmailAliasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     emailLogs?: boolean | EmailAlias$emailLogsArgs<ExtArgs>
@@ -6460,6 +6471,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       alias: string
+      domain: string
       userId: string
       isActive: boolean
       emailCount: number
@@ -6894,6 +6906,7 @@ export namespace Prisma {
   interface EmailAliasFieldRefs {
     readonly id: FieldRef<"EmailAlias", 'String'>
     readonly alias: FieldRef<"EmailAlias", 'String'>
+    readonly domain: FieldRef<"EmailAlias", 'String'>
     readonly userId: FieldRef<"EmailAlias", 'String'>
     readonly isActive: FieldRef<"EmailAlias", 'Boolean'>
     readonly emailCount: FieldRef<"EmailAlias", 'Int'>
@@ -10675,6 +10688,7 @@ export namespace Prisma {
   export const EmailAliasScalarFieldEnum: {
     id: 'id',
     alias: 'alias',
+    domain: 'domain',
     userId: 'userId',
     isActive: 'isActive',
     emailCount: 'emailCount',
@@ -11093,6 +11107,7 @@ export namespace Prisma {
     NOT?: EmailAliasWhereInput | EmailAliasWhereInput[]
     id?: StringFilter<"EmailAlias"> | string
     alias?: StringFilter<"EmailAlias"> | string
+    domain?: StringFilter<"EmailAlias"> | string
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -11107,6 +11122,7 @@ export namespace Prisma {
   export type EmailAliasOrderByWithRelationInput = {
     id?: SortOrder
     alias?: SortOrder
+    domain?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -11124,6 +11140,7 @@ export namespace Prisma {
     AND?: EmailAliasWhereInput | EmailAliasWhereInput[]
     OR?: EmailAliasWhereInput[]
     NOT?: EmailAliasWhereInput | EmailAliasWhereInput[]
+    domain?: StringFilter<"EmailAlias"> | string
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -11138,6 +11155,7 @@ export namespace Prisma {
   export type EmailAliasOrderByWithAggregationInput = {
     id?: SortOrder
     alias?: SortOrder
+    domain?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -11157,6 +11175,7 @@ export namespace Prisma {
     NOT?: EmailAliasScalarWhereWithAggregatesInput | EmailAliasScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"EmailAlias"> | string
     alias?: StringWithAggregatesFilter<"EmailAlias"> | string
+    domain?: StringWithAggregatesFilter<"EmailAlias"> | string
     userId?: StringWithAggregatesFilter<"EmailAlias"> | string
     isActive?: BoolWithAggregatesFilter<"EmailAlias"> | boolean
     emailCount?: IntWithAggregatesFilter<"EmailAlias"> | number
@@ -11682,6 +11701,7 @@ export namespace Prisma {
   export type EmailAliasCreateInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -11695,6 +11715,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedCreateInput = {
     id?: string
     alias: string
+    domain?: string
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -11708,6 +11729,7 @@ export namespace Prisma {
   export type EmailAliasUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11721,6 +11743,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -11734,6 +11757,7 @@ export namespace Prisma {
   export type EmailAliasCreateManyInput = {
     id?: string
     alias: string
+    domain?: string
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -11745,6 +11769,7 @@ export namespace Prisma {
   export type EmailAliasUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11755,6 +11780,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -12383,6 +12409,7 @@ export namespace Prisma {
   export type EmailAliasCountOrderByAggregateInput = {
     id?: SortOrder
     alias?: SortOrder
+    domain?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -12398,6 +12425,7 @@ export namespace Prisma {
   export type EmailAliasMaxOrderByAggregateInput = {
     id?: SortOrder
     alias?: SortOrder
+    domain?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -12409,6 +12437,7 @@ export namespace Prisma {
   export type EmailAliasMinOrderByAggregateInput = {
     id?: SortOrder
     alias?: SortOrder
+    domain?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -13145,6 +13174,7 @@ export namespace Prisma {
   export type EmailAliasCreateWithoutUserInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13157,6 +13187,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedCreateWithoutUserInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13280,6 +13311,7 @@ export namespace Prisma {
     NOT?: EmailAliasScalarWhereInput | EmailAliasScalarWhereInput[]
     id?: StringFilter<"EmailAlias"> | string
     alias?: StringFilter<"EmailAlias"> | string
+    domain?: StringFilter<"EmailAlias"> | string
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -13589,6 +13621,7 @@ export namespace Prisma {
   export type EmailAliasCreateWithoutEmailInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13601,6 +13634,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedCreateWithoutEmailInput = {
     id?: string
     alias: string
+    domain?: string
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -13629,6 +13663,7 @@ export namespace Prisma {
   export type EmailAliasUpdateWithoutEmailInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13641,6 +13676,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateWithoutEmailInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -13826,6 +13862,7 @@ export namespace Prisma {
   export type EmailAliasCreateWithoutEmailLogsInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13838,6 +13875,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedCreateWithoutEmailLogsInput = {
     id?: string
     alias: string
+    domain?: string
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -13866,6 +13904,7 @@ export namespace Prisma {
   export type EmailAliasUpdateWithoutEmailLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13878,6 +13917,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateWithoutEmailLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -14018,6 +14058,7 @@ export namespace Prisma {
   export type EmailAliasCreateManyUserInput = {
     id?: string
     alias: string
+    domain?: string
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -14043,6 +14084,7 @@ export namespace Prisma {
   export type EmailAliasUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14055,6 +14097,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14067,6 +14110,7 @@ export namespace Prisma {
   export type EmailAliasUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
+    domain?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

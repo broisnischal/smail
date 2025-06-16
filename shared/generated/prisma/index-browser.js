@@ -163,6 +163,7 @@ exports.Prisma.EmailScalarFieldEnum = {
 exports.Prisma.EmailAliasScalarFieldEnum = {
   id: 'id',
   alias: 'alias',
+  domain: 'domain',
   userId: 'userId',
   isActive: 'isActive',
   emailCount: 'emailCount',

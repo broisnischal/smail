@@ -96,7 +96,7 @@ model Subscription {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique // A user can only have one subscription.
 
-  plan   Plan   @relation(fields: [planId], references: [id])
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
   planId String
 
   @@map("subscriptions")
@@ -106,7 +106,7 @@ model Email {
   id      String     @id @default(cuid())
   address String
   aliasId String
-  alias   EmailAlias @relation(fields: [aliasId], references: [id])
+  alias   EmailAlias @relation(fields: [aliasId], references: [id], onDelete: Cascade)
 
   @@map("email")
 }
@@ -114,6 +114,8 @@ model Email {
 model EmailAlias {
   id    String @id @default(cuid())
   alias String @unique // e.g., abc@snehaa.store
+
+  domain String @default("snehaa.store")
 
   userId     String
   isActive   Boolean   @default(true)

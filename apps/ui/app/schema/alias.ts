@@ -10,5 +10,6 @@ export const alias = z.object({
     emailCount: z.number(),
     expiresAt: z.string().nullish(),
     createdAt: z.string(),
+    domain: z.string(),
     updatedAt: z.string()
 })  

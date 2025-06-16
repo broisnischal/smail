@@ -12,7 +12,7 @@ const provider = new Elysia({})
         Google: [
           "368826759806-rglob2arlkv1cfiqbg99bocltqsgbkjs.apps.googleusercontent.com",
           "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",
-          `${process.env.API_URL}/auth/google/callback`,
+          process.env.NODE_ENV === "production" ? `${process.env.API_URL}/auth/google/callback` : 'http://localhost:3000/api/auth/google/callback',
         ],
       },
       {

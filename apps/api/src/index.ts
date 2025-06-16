@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import provider from "./api/provider";
 import { JwtPayload, verify } from "jsonwebtoken";
 import cors from "@elysiajs/cors";
@@ -50,6 +50,10 @@ const app = new Elysia({ prefix: "/api" }).use(cors({
         where: { id: decoded.sub },
       });
 
+      if (!user) {
+        return { user: null };
+      }
+
       return { user };
     } catch (error) {
       console.error("Token verification failed:", error);
@@ -63,6 +67,7 @@ const app = new Elysia({ prefix: "/api" }).use(cors({
 
     const alias = await db.emailAlias.findMany({
       where: {
+        userId: user.id,
         email: {
           every: {
             address: user.email
@@ -76,6 +81,7 @@ const app = new Elysia({ prefix: "/api" }).use(cors({
         emailLogs: true,
         createdAt: true,
         expiresAt: true,
+        domain: true,
         isActive: true,
         id: true,
         updatedAt: true,
@@ -86,6 +92,96 @@ const app = new Elysia({ prefix: "/api" }).use(cors({
       alias,
       user
     };
+  }).post('/alias', async ({ body, db, user }) => {
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    const already = await db.emailAlias.findFirst({
+      where: {
+        alias: body.alias,
+      }
+    })
+    if (already) {
+      throw new Error('Alias already exists')
+    }
+
+
+
+    const alias = await db.emailAlias.create({
+      data: {
+        alias: body.alias,
+        userId: user.id,
+        email: {
+          create: {
+            address: user.email
+          }
+        },
+
+      }
+    })
+    return {
+      alias
+    }
+  }, {
+    body: t.Object({
+      alias: t.String(),
+    })
+  }).delete('/alias/:id', async ({ params, db, user }) => {
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    const alias = await db.emailAlias.findFirst({
+      where: {
+        id: params.id,
+        userId: user.id,
+      }
+    })
+
+    if (!alias) {
+      throw new Error('Alias not found')
+    }
+
+    await db.emailAlias.delete({
+      where: {
+        id: params.id,
+      }
+    })
+    return {
+      alias
+    }
+  }).put('/alias/:id', async ({ params, body, db, user }) => {
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
+    const alias = await db.emailAlias.findFirst({
+      where: {
+        id: params.id,
+        userId: user.id,
+      }
+    })
+
+    if (!alias) {
+      throw new Error('Alias not found')
+    }
+
+    await db.emailAlias.update({
+      where: {
+        id: params.id,
+      },
+      data: {
+        isActive: !body.isActive,
+      }
+    })
+    return {
+      alias
+    }
+  }, {
+    body: t.Object({
+      isActive: t.Boolean(),
+    })
   })
   .listen(3000);
 
