@@ -1,0 +1,175 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
+  output        = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  PAST_DUE
+}
+
+enum SubscriptionInterval {
+  MONTH
+  YEAR
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  aliases     EmailAlias[]
+  sessions    Session[]
+  connections Connection[]
+
+  subscription     Subscription?
+  stripeCustomerId String?       @unique
+
+  @@map("users")
+}
+
+// --- NEW: PLAN MODEL ---
+// Defines the different subscription plans you offer.
+model Plan {
+  id        String   @id @default(cuid())
+  name      String   @unique // e.g., "Free", "Pro", "Business"
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Plan Limits ---
+  // Based on your existing schema. Use -1 for unlimited.
+  maxAliases          Int @default(5)
+  maxForwardsPerMonth Int @default(100)
+
+  // --- Pricing Information ---
+  // Store price IDs from your payment provider (e.g., Stripe).
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+
+  // A plan can have many subscriptions.
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+// --- NEW: SUBSCRIPTION MODEL ---
+// Represents a user's subscription to a specific plan.
+model Subscription {
+  id String @id @default(cuid())
+
+  // The unique subscription ID from your payment provider (e.g., Stripe).
+  // This is the key to managing the subscription via webhooks.
+  stripeSubscriptionId String @unique
+
+  status   SubscriptionStatus
+  interval SubscriptionInterval
+
+  // The period the user has paid for.
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+
+  // Set to true when a user cancels, but the subscription
+  // remains active until the current period ends.
+  cancelAtPeriodEnd Boolean   @default(false)
+  canceledAt        DateTime?
+  trialEnd          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relationships ---
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique // A user can only have one subscription.
+
+  plan   Plan   @relation(fields: [planId], references: [id])
+  planId String
+
+  @@map("subscriptions")
+}
+
+model Email {
+  id      String     @id @default(cuid())
+  address String
+  aliasId String
+  alias   EmailAlias @relation(fields: [aliasId], references: [id])
+
+  @@map("email")
+}
+
+model EmailAlias {
+  id    String @id @default(cuid())
+  alias String @unique // e.g., abc@snehaa.store
+
+  userId     String
+  isActive   Boolean   @default(true)
+  emailCount Int       @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailLogs EmailLog[]
+  email     Email[]
+
+  @@map("email_aliases")
+}
+
+model EmailLog {
+  id          String    @id @default(cuid())
+  aliasId     String
+  fromEmail   String
+  toEmail     String // The real email it was forwarded to
+  subject     String
+  body        String?
+  headers     String? // JSON string of headers
+  status      String // 'forwarded', 'blocked', 'expired', 'failed'
+  receivedAt  DateTime  @default(now())
+  forwardedAt DateTime?
+
+  alias EmailAlias @relation(fields: [aliasId], references: [id], onDelete: Cascade)
+
+  @@map("email_logs")
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  expirationDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  // non-unique foreign key
+  @@index([userId])
+}
+
+model Connection {
+  id           String @id @default(cuid())
+  providerName String
+  providerId   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  @@unique([providerName, providerId])
+}

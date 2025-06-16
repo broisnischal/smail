@@ -1,29 +1,40 @@
-FROM node:20-alpine AS base
+FROM oven/bun:1.0.36 as builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-RUN apk add --no-cache openssl
+# Copy only necessary package files
+COPY package.json bun.lock ./
+COPY apps/api/package.json ./apps/api/
+COPY shared/package.json ./shared/
 
-# Copy root dependencies
-COPY package.json ./
-RUN npm install
+# Copy only necessary source files
+COPY shared ./shared
+COPY apps/api ./apps/api
 
-# Copy API dependencies
-COPY apps/api/package.json apps/api/package-lock.json ./apps/api/
+# Install dependencies
+RUN bun install
 
-# Install API dependencies
-WORKDIR /usr/src/app/apps/api
-RUN npm ci
+# Generate Prisma client
+RUN cd shared && bunx prisma generate
 
-# Copy full project
-WORKDIR /usr/src/app
-COPY . .
+# Production image
+FROM oven/bun:1.0.36-slim
 
-# Generate Prisma client (shared)
-RUN npx prisma generate --schema=prisma/schema.prisma
+WORKDIR /app
 
-# Set working directory to API
-WORKDIR /usr/src/app/apps/api
+# Copy everything we need from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api ./apps/api
+COPY --from=builder /app/shared/generated/prisma ./shared/generated/prisma
+
+# Create directory for database
+RUN mkdir -p /app/shared/prisma
+
+# Set working directory to the API app
+WORKDIR /app/apps/api
+
+# Expose the port the app runs on
 EXPOSE 3000
 
-CMD ["node", "src/index.ts"]
+# Start the application
+CMD ["bun", "run", "src/index.ts"]

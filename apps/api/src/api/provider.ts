@@ -1,17 +1,18 @@
-import { PrismaClient } from "../../../../generated/prisma";
 import Elysia, { Context, redirect } from "elysia";
 import { oauth2 } from "elysia-oauth2";
 import { sign } from "jsonwebtoken";
+import { db } from "../db";
+import { PrismaClient } from "../../../../shared/generated/prisma";
 
 const provider = new Elysia({})
-  .decorate("db", new PrismaClient())
+  .decorate("db", db)
   .use(
     oauth2(
       {
         Google: [
           "368826759806-rglob2arlkv1cfiqbg99bocltqsgbkjs.apps.googleusercontent.com",
           "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",
-          "http://localhost:3000/auth/google/callback",
+          `${process.env.API_URL}/auth/google/callback`,
         ],
       },
       {
@@ -101,7 +102,7 @@ const provider = new Elysia({})
       );
 
       token.set({
-        domain: "localhost",
+        domain: process.env.CLIENT_URL!,
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
         path: "/",
@@ -110,7 +111,7 @@ const provider = new Elysia({})
         value: appToken,
       });
 
-      return redirect("http://localhost:5173/");
+      return redirect(`${process.env.CLIENT_URL}/`);
     },
   );
 

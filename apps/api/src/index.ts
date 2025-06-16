@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import provider from "./api/provider";
 import { JwtPayload, verify } from "jsonwebtoken";
 import cors from "@elysiajs/cors";
-import { PrismaClient } from "../../../generated/prisma";
+import { db } from "./db";
 
 type AppTokenPayload = JwtPayload & {
   email: string;
@@ -10,11 +10,11 @@ type AppTokenPayload = JwtPayload & {
 };
 
 const app = new Elysia().use(cors({
-  origin: ["http://localhost:5173"],
+  origin: [process.env.CLIENT_URL!],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 }))
-  .decorate("db", new PrismaClient())
+  .decorate("db", db)
   .onBeforeHandle(({ cookie }) => {
     // console.log(cookie)
   })

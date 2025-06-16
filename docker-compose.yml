@@ -6,27 +6,26 @@ services:
     environment:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
-      - prisma_generated:/app/node_modules/.prisma # Consistent path
+      - ./shared/prisma:/app/shared/prisma
+    working_dir: /app/shared/prisma
     command: |+
       sh -c "
-        mkdir -p /app/prisma &&
-        touch /app/prisma/dev.db &&
-        bunx prisma migrate deploy &&
-        bunx prisma generate
+        bunx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
+        bunx prisma generate --schema=/app/shared/prisma/schema.prisma
       "
         
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    volumes:
-      - prisma_generated:/usr/src/app/node_modules/.prisma
     env_file: ./apps/api/.env
     ports:
       - "3000:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
+    volumes:
+      - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
 
   smtp:
@@ -45,15 +44,18 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes:
-      - prisma_generated:/usr/src/app/node_modules/.prisma
+      - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
 
   ui:
     build:
-      context: ./apps/ui
-      dockerfile: Dockerfile.node
+      context: .
+      dockerfile: apps/ui/Dockerfile.node
     ports:
       - "5173:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   caddy:
@@ -74,7 +76,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  prisma_generated:
   caddy_data:
     driver: local
   caddy_config:
