@@ -102,12 +102,12 @@ const provider = new Elysia({})
       );
 
       token.set({
-        domain: 'localhost',
+        domain: process.env.CLIENT_URL ? new URL(process.env.CLIENT_URL).hostname : 'localhost',
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
         path: "/",
         sameSite: "lax",
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         value: appToken,
       });
 

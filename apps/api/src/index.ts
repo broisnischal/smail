@@ -10,7 +10,11 @@ type AppTokenPayload = JwtPayload & {
 };
 
 const app = new Elysia({ prefix: "/api" }).use(cors({
-  origin: ["http://localhost:5173", "http://localhost:3000"],
+  origin: [
+    process.env.CLIENT_URL || "http://localhost:5173",
+    "http://localhost:3000",
+    "https://mail.snehaa.store"
+  ],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
 }))

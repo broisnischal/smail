@@ -39,7 +39,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action() {
-  return redirect(`${process.env.API_URL || 'http://localhost:3000/api'}/auth/google`);
+  const apiUrl = process.env.API_URL || 'http://localhost:3000/api'
+  return redirect(`${apiUrl}/auth/google`);
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {

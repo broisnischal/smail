@@ -20,6 +20,10 @@ API_URL=http://localhost:3000/api
 
 # Domain (for Caddy configuration)
 DOMAIN=localhost
+
+# SMTP Configuration
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-app-password
 ```
 
 ### Production Environment
@@ -38,6 +42,10 @@ API_URL=https://mail.snehaa.store/api
 
 # Domain (for Caddy configuration)
 DOMAIN=mail.snehaa.store
+
+# SMTP Configuration
+GMAIL_USER=your-email@gmail.com
+GMAIL_APP_PASSWORD=your-app-password
 ```
 
 ## Development
