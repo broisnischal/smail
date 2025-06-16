@@ -204,16 +204,24 @@ async function forwardEmail(
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD,
     },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 
   try {
-    // Extract original sender info with proper null checks
+    console.log("🔗 Testing Gmail connection before sending...");
+    await transporter.verify();
+    console.log("✅ Gmail connection verified successfully");
+
     const originalFrom =
       mail.from?.text || mail.from?.address || "Unknown Sender";
     const originalSubject = mail.subject || "No Subject";
     const originalDate = mail.date || new Date().toISOString();
 
-    // Create forwarding header
     const forwardingHeader = `
 ---------- Forwarded message ---------
 From: ${originalFrom}
@@ -223,7 +231,6 @@ To: ${originalRecipient}
 
 `;
 
-    // Prepare text content
     let textContent = forwardingHeader;
     if (mail.text) {
       textContent += mail.text;
@@ -231,7 +238,6 @@ To: ${originalRecipient}
       textContent += "[HTML content - see HTML version of this email]";
     }
 
-    // Prepare HTML content
     let htmlContent = "";
     if (mail.html) {
       htmlContent = `
@@ -269,7 +275,6 @@ To: ${originalRecipient}
       `;
     }
 
-    // Process attachments
     let attachments = [];
     if (mail.attachments && mail.attachments.length > 0) {
       attachments = mail.attachments.map((attachment: any) => ({
@@ -281,7 +286,6 @@ To: ${originalRecipient}
       }));
     }
 
-    // Create headers with proper string types
     const customHeaders: { [key: string]: string } = {};
 
     if (originalFrom) {
@@ -308,10 +312,10 @@ To: ${originalRecipient}
       headers: customHeaders,
     };
 
+    console.log(`📤 Sending email to: ${forwardTo}`);
     const result = await transporter.sendMail(mailOptions);
     console.log(`✅ Email forwarded to ${forwardTo}:`, result.messageId);
 
-    // Log forwarding details
     console.log({
       originalFrom: originalFrom,
       originalSubject: originalSubject,
@@ -324,19 +328,28 @@ To: ${originalRecipient}
 
     return result;
   } catch (error) {
-    console.error("Error forwarding email:", error);
+    console.error("❌ Error forwarding email:", error);
+
+    if (error.code === 'EAUTH') {
+      console.error("🔐 Authentication failed. Check Gmail credentials and App Password.");
+    } else if (error.code === 'ETIMEDOUT') {
+      console.error("⏰ Connection timeout. Check network connectivity and firewall settings.");
+    } else if (error.code === 'ECONNECTION') {
+      console.error("🌐 Connection failed. Check internet connectivity.");
+    } else if (error.code === 'ESOCKET') {
+      console.error("🔌 Socket error. Check network configuration.");
+    }
+
     throw error;
   }
 }
 
 const PORT = process.env.NODE_ENV === "production" ? 25 : 2525;
 
-// Simple server startup like your working version
 server.listen(25, () => {
   console.log("🚀 SMTP Server listening on port 25");
 });
 
-// Graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("🛑 Received SIGTERM, shutting down gracefully...");
   await prisma.$disconnect();

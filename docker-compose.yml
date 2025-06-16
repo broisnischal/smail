@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
@@ -42,6 +44,8 @@ services:
     build:
       context: .
       dockerfile: apps/smtp/Dockerfile
+    env_file:
+      - .env
     environment:
       SMTP_PORT: 25
       GMAIL_USER: ${GMAIL_USER:-nischalm3pro@gmail.com}
@@ -65,6 +69,8 @@ services:
     build:
       context: .
       dockerfile: apps/ui/Dockerfile.node
+    env_file:
+      - .env
     environment:
       API_URL: ${API_URL:-http://api:3000/api}
       CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
@@ -86,6 +92,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+    env_file:
+      - .env
     environment:
       - DOMAIN=${DOMAIN:-localhost}
     depends_on:
