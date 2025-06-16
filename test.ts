@@ -2,15 +2,9 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "localhost",
+  host: "mail.a.aitchomes.com",
   port: 2525,
-  secure: false, // No SSL/TLS
-  ignoreTLS: true, // Ignore TLS completely
-  requireTLS: false, // Don't require TLS
-  auth: false, // No authentication
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  secure: false,
 });
 
 async function testEmail() {
