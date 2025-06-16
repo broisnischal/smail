@@ -6,7 +6,7 @@ import * as nodemailer from "nodemailer";
 const prisma = new PrismaClient();
 
 // Try different ports in order of preference
-const PORTS_TO_TRY = [25, 2525, 3025, 8025, 9025];
+const PORTS_TO_TRY = [2525, 3025, 8025, 9025];
 const HOST = "127.0.0.1"; // Use localhost instead of 0.0.0.0
 
 async function createSMTPServer() {
