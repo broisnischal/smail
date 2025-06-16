@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: "localhost",
-  port: 25,
+  port: 2525,
   secure: false,
 });
 
@@ -13,7 +13,7 @@ async function testEmail() {
 
     const info = await transporter.sendMail({
       from: '"Test Sender" <test@example.com>',
-      to: "codewithnws@snehaa.store",
+      to: "cybnischal@snehaa.store",
       subject: "Test Email from Node.js",
       text: "This is a test email sent to your SMTP server",
       html: "<b>This is a test email</b> sent to your SMTP server",
