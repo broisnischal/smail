@@ -1,17 +1,16 @@
 # Development configuration
-http://localhost:80 {
-	# API routes - handle all /api/* requests
-	handle /api/* {
-		reverse_proxy api:3000
-	}
+# http://localhost:80 {
+# 	# API routes - handle all /api/* requests
+# 	handle /api/* {
+# 		reverse_proxy api:3000
+# 	}
 
-	# UI routes - handle everything else
-	handle /* {
-		reverse_proxy ui:3000
-	}
-}
+# 	# UI routes - handle everything else
+# 	handle /* {
+# 		reverse_proxy ui:3000
+# 	}
+# }
 
-# Replace with your actual domain
 web.snehaa.store {
 	# API routes - define first
 	handle /api/* {
@@ -33,9 +32,9 @@ web.snehaa.store {
 }
 
 # Optional: Redirect www to non-www
-www.web.snehaa.store {
-	redir https://mail.snehaa.store{uri}
-}
+# www.web.snehaa.store {
+# 	redir https://mail.snehaa.store{uri}
+# }
 
 # Production configuration (uncomment and modify for production)
 # your-domain.com {

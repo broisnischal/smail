@@ -84,9 +84,15 @@ services:
       - api
       - ui
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
 volumes:
   caddy_data:
     driver: local
   caddy_config:
     driver: local
+
+networks:
+  snehaa-network:
+    driver: bridge
