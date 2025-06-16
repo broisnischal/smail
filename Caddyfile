@@ -1,6 +1,6 @@
 # Global settings
 {
-	auto_https off
+	auto_https on
 }
 
 # Development configuration
@@ -16,17 +16,34 @@ http://localhost:80 {
 	}
 }
 
-# Production configuration
+# Replace with your actual domain
 web.snehaa.store {
-	# API routes - handle all /api/* requests
+	# UI routes - serve the main app
+	handle /* {
+		reverse_proxy ui:5173
+	}
+
+	# API routes
 	handle /api/* {
 		reverse_proxy api:3000
 	}
 
-	# UI routes - handle everything else
-	handle /* {
-		reverse_proxy ui:3000
+	# Optional: Add security headers
+	header {
+		# Enable HSTS
+		Strict-Transport-Security max-age=31536000;
+		# Prevent MIME sniffing
+		X-Content-Type-Options nosniff
+		# Prevent clickjacking
+		X-Frame-Options DENY
+		# XSS protection
+		X-XSS-Protection "1; mode=block"
 	}
+}
+
+# Optional: Redirect www to non-www
+www.web.snehaa.store {
+	redir https://mail.snehaa.store{uri}
 }
 
 # Production configuration (uncomment and modify for production)
