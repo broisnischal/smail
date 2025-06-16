@@ -17,7 +17,7 @@ http://localhost:80 {
 }
 
 # Production configuration
-mail.snehaa.store {
+web.snehaa.store {
 	# API routes - handle all /api/* requests
 	handle /api/* {
 		reverse_proxy api:3000
