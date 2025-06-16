@@ -1,8 +1,3 @@
-# Global settings
-{
-	auto_https on
-}
-
 # Development configuration
 http://localhost:80 {
 	# API routes - handle all /api/* requests
