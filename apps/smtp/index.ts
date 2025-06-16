@@ -138,6 +138,9 @@ async function handleIncomingMail(mail: any, session: any) {
   try {
     console.log(`📧 Processing email for: ${recipient}`);
 
+    console.log(process.env.GMAIL_USER);
+    console.log(process.env.GMAIL_APP_PASSWORD);
+
     const alias = await prisma.emailAlias.findFirst({
       where: { alias: recipient.split("@")[0], isActive: true },
       include: { user: true },
