@@ -14,8 +14,9 @@ COPY apps/smtp ./apps/smtp
 # Install dependencies
 RUN bun install
 
-# Generate Prisma client
-RUN cd shared && bunx prisma generate
+# Generate Prisma client with correct binary targets
+WORKDIR /app/shared
+RUN bunx prisma generate --schema=./prisma/schema.prisma
 
 # Production image
 FROM oven/bun:1.0.36-slim
