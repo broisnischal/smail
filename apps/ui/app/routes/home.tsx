@@ -40,7 +40,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export async function action() {
   const apiUrl = process.env.API_URL || 'http://localhost:3000/api'
-  return redirect(`${apiUrl}/auth/google`);
+  return redirect(`${apiUrl}/auth/google`,);
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -64,7 +64,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             <Button className="cursor-pointer" type="submit">Sign Out</Button>
           </Form>
         </div> : (
-          <Form method="post">
+          <Form method="post" navigate={true}>
             <Button className="cursor-pointer" type="submit">Sign In with Google</Button>
           </Form>
         )
