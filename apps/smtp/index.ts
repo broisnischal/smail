@@ -215,19 +215,7 @@ async function forwardEmail(
   forwardTo: string,
   originalRecipient: string,
 ) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
+  const transporter = createTransporter();
 
   try {
     // Extract original sender info with proper null checks
