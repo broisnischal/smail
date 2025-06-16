@@ -6,8 +6,8 @@ COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
 COPY shared/package.json ./shared/
 
-# Install root dependencies first
-RUN npm install
+# Install root dependencies first with force flag to handle optional dependencies
+RUN npm install --force
 
 # Copy source files
 COPY shared ./shared
