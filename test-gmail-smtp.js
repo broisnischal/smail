@@ -8,7 +8,7 @@ async function testGmailConnection() {
     console.log('Gmail User:', process.env.GMAIL_USER);
     console.log('Gmail App Password:', process.env.GMAIL_APP_PASSWORD ? '***SET***' : 'NOT SET');
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.GMAIL_USER,
@@ -30,7 +30,7 @@ async function testGmailConnection() {
         console.log('📧 Testing email sending...');
         const result = await transporter.sendMail({
             from: process.env.GMAIL_USER,
-            to: process.env.GMAIL_USER, // Send to yourself for testing
+            to: "nischaldahal01395@gmail.com", // Send to yourself for testing
             subject: 'Test Email from SMTP Server',
             text: 'This is a test email to verify Gmail SMTP connection.',
             html: '<h1>Test Email</h1><p>This is a test email to verify Gmail SMTP connection.</p>',

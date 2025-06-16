@@ -5,6 +5,21 @@ import { PrismaClient } from "../../shared/generated/prisma";
 
 const prisma = new PrismaClient();
 
+// Create a reusable transporter with the exact same config as the working test
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+    // Use the exact same timeout settings as the working test
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
+};
+
 const server = new SMTPServer({
   secure: false,
   authOptional: true,
@@ -213,15 +228,13 @@ async function forwardEmail(
   });
 
   try {
-    console.log("🔗 Testing Gmail connection before sending...");
-    await transporter.verify();
-    console.log("✅ Gmail connection verified successfully");
-
+    // Extract original sender info with proper null checks
     const originalFrom =
       mail.from?.text || mail.from?.address || "Unknown Sender";
     const originalSubject = mail.subject || "No Subject";
     const originalDate = mail.date || new Date().toISOString();
 
+    // Create forwarding header
     const forwardingHeader = `
 ---------- Forwarded message ---------
 From: ${originalFrom}
@@ -231,6 +244,7 @@ To: ${originalRecipient}
 
 `;
 
+    // Prepare text content
     let textContent = forwardingHeader;
     if (mail.text) {
       textContent += mail.text;
@@ -238,6 +252,7 @@ To: ${originalRecipient}
       textContent += "[HTML content - see HTML version of this email]";
     }
 
+    // Prepare HTML content
     let htmlContent = "";
     if (mail.html) {
       htmlContent = `
@@ -275,6 +290,7 @@ To: ${originalRecipient}
       `;
     }
 
+    // Process attachments
     let attachments = [];
     if (mail.attachments && mail.attachments.length > 0) {
       attachments = mail.attachments.map((attachment: any) => ({
@@ -286,6 +302,7 @@ To: ${originalRecipient}
       }));
     }
 
+    // Create headers with proper string types
     const customHeaders: { [key: string]: string } = {};
 
     if (originalFrom) {
@@ -316,6 +333,7 @@ To: ${originalRecipient}
     const result = await transporter.sendMail(mailOptions);
     console.log(`✅ Email forwarded to ${forwardTo}:`, result.messageId);
 
+    // Log forwarding details
     console.log({
       originalFrom: originalFrom,
       originalSubject: originalSubject,
@@ -330,6 +348,7 @@ To: ${originalRecipient}
   } catch (error) {
     console.error("❌ Error forwarding email:", error);
 
+    // Provide more specific error information
     if (error.code === 'EAUTH') {
       console.error("🔐 Authentication failed. Check Gmail credentials and App Password.");
     } else if (error.code === 'ETIMEDOUT') {
