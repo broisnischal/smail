@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "../../../../generated/prisma";
 import Elysia, { Context, redirect } from "elysia";
 import { oauth2 } from "elysia-oauth2";
 import { sign } from "jsonwebtoken";
