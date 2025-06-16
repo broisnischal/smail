@@ -1,0 +1,29 @@
+# Replace with your actual domain
+mail.snehaa.store {
+    # UI routes - serve the main app
+    handle /* {
+        reverse_proxy ui:5173
+    }
+    
+    # API routes
+    handle /api/* {
+        reverse_proxy api:3000
+    }
+    
+    # Optional: Add security headers
+    header {
+        # Enable HSTS
+        Strict-Transport-Security max-age=31536000;
+        # Prevent MIME sniffing
+        X-Content-Type-Options nosniff
+        # Prevent clickjacking
+        X-Frame-Options DENY
+        # XSS protection
+        X-XSS-Protection "1; mode=block"
+    }
+}
+
+# Optional: Redirect www to non-www
+www.mail.snehaa.store {
+    redir https://mail.snehaa.store{uri}
+}

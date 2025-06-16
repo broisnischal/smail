@@ -1,4 +1,5 @@
 {
+  "name": "smtp",
   "type": "module",
   "dependencies": {
     "@prisma/client": "^6.9.0",

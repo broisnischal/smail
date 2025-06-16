@@ -1,6 +1,6 @@
+import { PrismaClient } from '../../../../generated/prisma';
 import Elysia, { Context, redirect } from "elysia";
 import { oauth2 } from "elysia-oauth2";
-import { PrismaClient } from "../../../../generated/prisma";
 import { sign } from "jsonwebtoken";
 
 const provider = new Elysia({})

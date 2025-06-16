@@ -1,8 +1,8 @@
 import { Elysia } from "elysia";
 import provider from "./api/provider";
-import { PrismaClient } from "../../../generated/prisma/index";
 import { JwtPayload, verify } from "jsonwebtoken";
 import cors from "@elysiajs/cors";
+import { PrismaClient } from '../../../generated/prisma';
 
 type AppTokenPayload = JwtPayload & {
   email: string;

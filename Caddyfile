@@ -1,0 +1,25 @@
+# Development configuration
+localhost {
+	# UI routes
+	handle /* {
+		reverse_proxy ui:5173
+	}
+
+	# API routes
+	handle /api/* {
+		reverse_proxy api:3000
+	}
+}
+
+# Production configuration (uncomment and modify for production)
+# your-domain.com {
+#     # UI routes
+#     handle /* {
+#         reverse_proxy ui:5173
+#     }
+#     
+#     # API routes  
+#     handle /api/* {
+#         reverse_proxy api:3000
+#     }
+# }
