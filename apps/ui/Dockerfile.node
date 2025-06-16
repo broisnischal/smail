@@ -6,8 +6,11 @@ COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
 COPY shared/package.json ./shared/
 
-# Install root dependencies first with force flag to handle optional dependencies
-RUN npm install --force
+# Install root dependencies first
+RUN npm install
+
+# Explicitly install the missing Rollup native dependency
+RUN npm install @rollup/rollup-linux-x64-musl
 
 # Copy source files
 COPY shared ./shared
