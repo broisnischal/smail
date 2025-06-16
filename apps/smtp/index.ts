@@ -237,8 +237,8 @@ To: ${originalRecipient}
             <strong>---------- Forwarded message ---------</strong><br>
             <strong>From:</strong> ${originalFrom}<br>
             <strong>Date:</strong> ${new Date(
-              originalDate,
-            ).toLocaleString()}<br>
+        originalDate,
+      ).toLocaleString()}<br>
             <strong>Subject:</strong> ${originalSubject}<br>
             <strong>To:</strong> ${originalRecipient}
           </p>
@@ -254,8 +254,8 @@ To: ${originalRecipient}
             <strong>---------- Forwarded message ---------</strong><br>
             <strong>From:</strong> ${originalFrom}<br>
             <strong>Date:</strong> ${new Date(
-              originalDate,
-            ).toLocaleString()}<br>
+        originalDate,
+      ).toLocaleString()}<br>
             <strong>Subject:</strong> ${originalSubject}<br>
             <strong>To:</strong> ${originalRecipient}
           </p>

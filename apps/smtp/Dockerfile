@@ -1,21 +1,22 @@
-FROM oven/bun:1 as base
+FROM oven/bun:1-alpine AS base
 WORKDIR /usr/src/app
 
-# Copy root package files
+# Install OpenSSL
+RUN apk add --no-cache openssl
+
+# Copy root dependencies
 COPY package.json bun.lock ./
-COPY apps/smtp/package.json apps/smtp/bun.lock* ./apps/smtp/
+COPY apps/smtp/package.json* ./apps/smtp/
 
-# Install root dependencies
+# Install dependencies
 RUN bun install --frozen-lockfile
 
-# Install SMTP dependencies
-WORKDIR /usr/src/app/apps/smtp
-RUN bun install --frozen-lockfile
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN bunx prisma generate
 
-# Copy SMTP source code
-COPY apps/smtp/index.ts ./
+# Copy SMTP source
+COPY apps/smtp ./apps/smtp/
 
-WORKDIR /usr/src/app/apps/smtp
-
-EXPOSE 2525
-CMD ["bun", "run", "index.ts"]
+EXPOSE 25
+CMD ["bun", "run", "apps/smtp/index.ts"]

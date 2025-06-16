@@ -1,22 +1,13 @@
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
+FROM oven/bun:1-alpine
+WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-  openssl \
-  && rm -rf /var/lib/apt/lists/*
+# Install OpenSSL
+RUN apk add --no-cache openssl
 
-# Copy package files
 COPY package.json bun.lock ./
+RUN bun install
 
-# Install dependencies
-RUN bun install --frozen-lockfile
+COPY prisma ./prisma/
+COPY . .
 
-# Copy prisma and generated files
-COPY prisma ./prisma
-COPY generated ./generated
-
-# Generate Prisma client
-RUN bunx prisma generate
-
-CMD ["bunx", "prisma", "migrate", "deploy"]
+CMD ["bun", "run", "start"]

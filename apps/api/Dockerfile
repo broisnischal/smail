@@ -1,29 +1,22 @@
-FROM oven/bun:1 as base
+FROM oven/bun:1-alpine AS base
 WORKDIR /usr/src/app
 
-# Copy root package files
+# Install OpenSSL
+RUN apk add --no-cache openssl
+
+# Copy root dependencies
 COPY package.json bun.lock ./
-COPY apps/api/package.json apps/api/bun.lock* ./apps/api/
+COPY apps/api/package.json ./apps/api/
 
-# Install root dependencies first
+# Install all dependencies
 RUN bun install --frozen-lockfile
 
-# Copy shared libraries
-COPY apps/lib ./apps/lib
+# Copy Prisma schema and generate client
+COPY prisma ./prisma/
+RUN bunx prisma generate
 
-# Install API dependencies
-WORKDIR /usr/src/app/apps/api
-RUN bun install --frozen-lockfile
-
-# Copy API source code
-COPY apps/api/src ./src
-COPY apps/api/tsconfig.json ./
-
-# Copy generated Prisma client and schema
-COPY generated /usr/src/app/generated
-COPY prisma /usr/src/app/prisma
-
-WORKDIR /usr/src/app/apps/api
+# Copy API source
+COPY apps/api ./apps/api/
 
 EXPOSE 3000
-CMD ["bun", "run", "src/index.ts"]
+CMD ["bun", "run", "apps/api/index.ts"]
