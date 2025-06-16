@@ -1,7 +1,7 @@
 import { SMTPServer } from "smtp-server";
 import { simpleParser } from "mailparser";
-import { PrismaClient, SubscriptionStatus } from "../../generated/prisma";
 import * as nodemailer from "nodemailer";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

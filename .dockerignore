@@ -23,3 +23,17 @@ apps/*/build
 apps/ui/dist
 apps/ui/build
 prisma/dev.db*
+
+**/node_modules
+**/build
+**/.env
+**/*.md
+**/Dockerfile
+docker-compose.yml
+.git
+
+**/node_modules
+**/.env
+**/build
+.git
+*.md

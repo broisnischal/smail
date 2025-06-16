@@ -4,21 +4,23 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache openssl
 
-# Copy API dependencies
-COPY apps/api/package.json apps/api/bun.lock ./
-
-# Install dependencies
+# Copy root dependencies first
+COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-# Copy Prisma schema
-COPY prisma/schema.prisma ./prisma/schema.prisma
+# Copy API dependencies
+COPY apps/api/package.json apps/api/bun.lock ./apps/api/
 
-# Copy generated Prisma client
-COPY generated/prisma ./generated/prisma
+# Install API dependencies
+WORKDIR /usr/src/app/apps/api
+RUN bun install --frozen-lockfile
 
-# Copy API source code
-COPY apps/api .
+# Copy the rest of the project
+WORKDIR /usr/src/app
+COPY . .
 
+# Set final working directory
+WORKDIR /usr/src/app/apps/api
 EXPOSE 3000
 
 CMD ["bun", "run", "src/index.ts"]

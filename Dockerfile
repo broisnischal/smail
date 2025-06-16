@@ -1,13 +1,11 @@
+# Root Dockerfile
 FROM oven/bun:1-alpine
+
 WORKDIR /app
 
-# Install OpenSSL
 RUN apk add --no-cache openssl
 
 COPY package.json bun.lock ./
-RUN bun install
+RUN bun install --frozen-lockfile
 
-COPY prisma ./prisma/
 COPY . .
-
-CMD ["bun", "run", "start"]

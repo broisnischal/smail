@@ -6,27 +6,27 @@ services:
     environment:
       DATABASE_URL: "file:./prisma/dev.db"
     volumes:
-      - ./prisma:/app/prisma
-      - ./generated:/app/generated
+      - prisma_generated:/app/node_modules/.prisma # Consistent path
     command: |+
       sh -c "
-        echo 'Running migrations...' &&
+        mkdir -p /app/prisma &&
+        touch /app/prisma/dev.db &&
         bunx prisma migrate deploy &&
-        echo 'Generating Prisma client...' &&
-        bunx prisma generate"
+        bunx prisma generate
+      "
         
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    volumes:
+      - prisma_generated:/usr/src/app/node_modules/.prisma
     env_file: ./apps/api/.env
     ports:
       - "3000:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
-    volumes:
-      - prisma_generated:/usr/src/app/node_modules/.prisma
     restart: unless-stopped
 
   smtp:
@@ -53,7 +53,7 @@ services:
       context: ./apps/ui
       dockerfile: Dockerfile.node
     ports:
-      - "5173:5173"
+      - "5173:3000"
     restart: unless-stopped
 
   caddy:
@@ -62,6 +62,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      # use prod 
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
@@ -74,7 +75,6 @@ services:
 
 volumes:
   prisma_generated:
-    driver: local
   caddy_data:
     driver: local
   caddy_config:
