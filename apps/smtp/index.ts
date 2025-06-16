@@ -365,8 +365,8 @@ To: ${originalRecipient}
 
 const PORT = process.env.NODE_ENV === "production" ? 25 : 2525;
 
-server.listen(25, () => {
-  console.log("🚀 SMTP Server listening on port 25");
+server.listen(PORT, () => {
+  console.log("🚀 SMTP Server listening on port " + PORT);
 });
 
 process.on("SIGTERM", async () => {
