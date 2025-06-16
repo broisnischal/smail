@@ -1,12 +1,15 @@
 {
+  "type": "module",
   "dependencies": {
+    "@prisma/client": "^6.9.0",
     "@types/mailparser": "^3.4.6",
     "@types/nodemailer": "^6.4.17",
     "mailparser": "^3.7.3",
+    "nodemailer": "^7.0.3",
     "smtp-server": "^3.13.8"
   },
   "devDependencies": {
-    "@types/node": "^24.0.1"
-  },
-  "scripts": {}
+    "@types/node": "^24.0.1",
+    "prisma": "^6.9.0"
+  }
 }

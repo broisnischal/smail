@@ -6,9 +6,14 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@bogeychan/elysia-oauth2": "^0.1.0",
+    "arctic": "^3.7.0",
+    "elysia": "latest",
+    "elysia-oauth2": "^2.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "bun-types": "latest"
   },
   "module": "src/index.js"
