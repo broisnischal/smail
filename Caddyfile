@@ -11,15 +11,15 @@
 # 	}
 # }
 
-web.snehaa.store:5555 {
+web.snehaa.store {
 	# API routes - define first
 	handle /api/* {
-		reverse_proxy api:3000
+		reverse_proxy localhost:3000
 	}
 
 	# UI routes - fallback
 	handle /* {
-		reverse_proxy ui:3000
+		reverse_proxy localhost:5173
 	}
 
 	# Headers
