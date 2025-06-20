@@ -17,11 +17,6 @@ RUN npm cache clean --force
 # Install dependencies with specific flags to reduce space usage
 RUN npm install --no-optional --prefer-offline --progress=false --loglevel=error
 
-# Install platform-specific native dependencies for GNU/Linux
-RUN npm install @rollup/rollup-linux-x64-gnu --no-optional --progress=false
-RUN npm install lightningcss-linux-x64-gnu --no-optional --progress=false
-RUN npm install @tailwindcss/oxide-linux-x64-gnu --no-optional --progress=false
-
 # Copy source files
 COPY shared ./shared
 COPY apps/ui ./apps/ui
