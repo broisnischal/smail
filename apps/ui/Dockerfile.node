@@ -1,76 +1,26 @@
-# # Use Debian-based image instead of Alpine for better compatibility with native modules
-# FROM node:20-slim AS development-dependencies-env
-# WORKDIR /app
-
-# # Set npm cache directory and increase max memory
-# ENV NPM_CONFIG_CACHE=/tmp/.npm
-# ENV NODE_OPTIONS="--max-old-space-size=2048"
-
-# # Copy package files with better layer caching
-# COPY package.json package-lock.json* ./
-# COPY apps/ui/package.json ./apps/ui/
-# COPY shared/package.json ./shared/
-
-# # Clean npm cache first to ensure we have space
-# RUN npm cache clean --force
-
-# # Install dependencies with specific flags to reduce space usage
-# RUN npm install --no-optional --prefer-offline --progress=false --loglevel=error
-
-# # Install platform-specific native dependencies for GNU/Linux
-# RUN npm install @rollup/rollup-linux-x64-gnu --no-optional --progress=false
-# RUN npm install lightningcss-linux-x64-gnu --no-optional --progress=false
-# RUN npm install @tailwindcss/oxide-linux-x64-gnu --no-optional --progress=false
-
-# # Copy source files
-# COPY shared ./shared
-# COPY apps/ui ./apps/ui
-
-# # Build the UI
-# WORKDIR /app/apps/ui
-# RUN npm run build
-
-# # Clean up node_modules after build to save space
-# RUN rm -rf /app/node_modules/.cache
-
-# # Production image
-# FROM node:20-slim AS production
-# WORKDIR /app
-
-# # Install only production dependencies
-# COPY package.json package-lock.json* ./
-# COPY apps/ui/package.json ./apps/ui/
-# RUN npm ci --only=production --no-optional --progress=false
-
-# # Copy built application
-# COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
-
-# # Set working directory to the UI app
-# WORKDIR /app/apps/ui
-
-# # Create non-root user for security
-# RUN groupadd -g 1001 nodejs && useradd -r -u 1001 -g nodejs nextjs
-# USER nextjs
-
-# # Expose the port
-# EXPOSE 3000
-
-# # Start the application
-# CMD ["npm", "run", "start"]
-
-FROM node:20-alpine AS development-dependencies-env
+# Use Debian-based image instead of Alpine for better compatibility with native modules
+FROM node:20-slim AS development-dependencies-env
 WORKDIR /app
 
-# Copy root package files first
+# Set npm cache directory and increase max memory
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# Copy package files with better layer caching
 COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
 COPY shared/package.json ./shared/
 
-# Install root dependencies first
-RUN npm install
+# Clean npm cache first to ensure we have space
+RUN npm cache clean --force
 
-# Explicitly install the missing Rollup native dependency
-RUN npm install @rollup/rollup-linux-x64-musl
+# Install dependencies with specific flags to reduce space usage
+RUN npm install --no-optional --prefer-offline --progress=false --loglevel=error
+
+# Install platform-specific native dependencies for GNU/Linux
+RUN npm install @rollup/rollup-linux-x64-gnu --no-optional --progress=false
+RUN npm install lightningcss-linux-x64-gnu --no-optional --progress=false
+RUN npm install @tailwindcss/oxide-linux-x64-gnu --no-optional --progress=false
 
 # Copy source files
 COPY shared ./shared
@@ -80,18 +30,27 @@ COPY apps/ui ./apps/ui
 WORKDIR /app/apps/ui
 RUN npm run build
 
+# Clean up node_modules after build to save space
+RUN rm -rf /app/node_modules/.cache
+
 # Production image
-FROM node:20-alpine
+FROM node:20-slim AS production
 WORKDIR /app
 
-# Copy only what's needed for production
+# Install only production dependencies
 COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
-COPY --from=development-dependencies-env /app/node_modules ./node_modules
+RUN npm ci --only=production --no-optional --progress=false
+
+# Copy built application
 COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
 
 # Set working directory to the UI app
 WORKDIR /app/apps/ui
+
+# Create non-root user for security
+RUN groupadd -g 1001 nodejs && useradd -r -u 1001 -g nodejs nextjs
+USER nextjs
 
 # Expose the port
 EXPOSE 3000
