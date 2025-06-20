@@ -11,7 +11,7 @@
 # 	}
 # }
 
-web.snehaa.store {
+web.snehaa.store:3000 {
 	# API routes - define first
 	handle /api/* {
 		reverse_proxy api:3000
