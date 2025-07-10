@@ -52,6 +52,7 @@ services:
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
       DATABASE_URL: ${DATABASE_URL:-file:./prisma/dev.db}
       API_URL: ${API_URL:-http://localhost:3000/api}
+      RESEND_API_KEY: ${RESEND_API_KEY}
     cap_add:
       - NET_BIND_SERVICE
     ports:
@@ -83,6 +84,24 @@ services:
     networks:
       - snehaa-network
 
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./cloudflare.crt:/etc/certs/cloudflare.crt
+      - ./cloudflare.key:/etc/certs/cloudflare.key
+    depends_on:
+      - api 
+      - ui
+    networks:
+      - snehaa-network
+
 networks:
   snehaa-network:
     driver: bridge
+  

@@ -1,50 +1,15 @@
-# Development configuration
-# http://localhost:80 {
-# 	# API routes - handle all /api/* requests
-# 	handle /api/* {
-# 		reverse_proxy api:3000
-# 	}
-
-# 	# UI routes - handle everything else
-# 	handle /* {
-# 		reverse_proxy ui:3000
-# 	}
-# }
-
-web.snehaa.store {
-	# API routes - define first
-	handle /api/* {
-		reverse_proxy localhost:3000
-	}
-
-	# UI routes - fallback
-	handle /* {
-		reverse_proxy localhost:5173
-	}
-
-	# Headers
-	header {
-		Strict-Transport-Security max-age=31536000;
-		X-Content-Type-Options nosniff
-		X-Frame-Options DENY
-		X-XSS-Protection "1; mode=block"
-	}
+temp.snehaa.store {
+    
+    handle /api/* {
+        reverse_proxy api:3000
+    }
+    handle /* {
+        reverse_proxy ui:3001
+    }
+    header {
+        Strict-Transport-Security max-age=31536000;
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+    }
 }
-
-# Optional: Redirect www to non-www
-# www.web.snehaa.store {
-# 	redir https://mail.snehaa.store{uri}
-# }
-
-# Production configuration (uncomment and modify for production)
-# your-domain.com {
-#     # UI routes
-#     handle /* {
-#         reverse_proxy ui:5173
-#     }
-#     
-#     # API routes  
-#     handle /api/* {
-#         reverse_proxy api:3000
-#     }
-# }

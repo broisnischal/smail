@@ -348,8 +348,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.9.0
-   * Query Engine version: 81e4af48011447c3cc503a190e86995b66d2a28e
+   * Prisma Client JS version: 6.11.1
+   * Query Engine version: f40f79ec31188888a2e33acda0ecc8fd10a853a9
    */
   export type PrismaVersion = {
     client: string
@@ -6186,10 +6186,12 @@ export namespace Prisma {
   }
 
   export type EmailAliasAvgAggregateOutputType = {
+    maxAge: number | null
     emailCount: number | null
   }
 
   export type EmailAliasSumAggregateOutputType = {
+    maxAge: number | null
     emailCount: number | null
   }
 
@@ -6197,6 +6199,7 @@ export namespace Prisma {
     id: string | null
     alias: string | null
     domain: string | null
+    maxAge: number | null
     userId: string | null
     isActive: boolean | null
     emailCount: number | null
@@ -6209,6 +6212,7 @@ export namespace Prisma {
     id: string | null
     alias: string | null
     domain: string | null
+    maxAge: number | null
     userId: string | null
     isActive: boolean | null
     emailCount: number | null
@@ -6221,6 +6225,7 @@ export namespace Prisma {
     id: number
     alias: number
     domain: number
+    maxAge: number
     userId: number
     isActive: number
     emailCount: number
@@ -6232,10 +6237,12 @@ export namespace Prisma {
 
 
   export type EmailAliasAvgAggregateInputType = {
+    maxAge?: true
     emailCount?: true
   }
 
   export type EmailAliasSumAggregateInputType = {
+    maxAge?: true
     emailCount?: true
   }
 
@@ -6243,6 +6250,7 @@ export namespace Prisma {
     id?: true
     alias?: true
     domain?: true
+    maxAge?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6255,6 +6263,7 @@ export namespace Prisma {
     id?: true
     alias?: true
     domain?: true
+    maxAge?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6267,6 +6276,7 @@ export namespace Prisma {
     id?: true
     alias?: true
     domain?: true
+    maxAge?: true
     userId?: true
     isActive?: true
     emailCount?: true
@@ -6366,6 +6376,7 @@ export namespace Prisma {
     id: string
     alias: string
     domain: string
+    maxAge: number
     userId: string
     isActive: boolean
     emailCount: number
@@ -6397,6 +6408,7 @@ export namespace Prisma {
     id?: boolean
     alias?: boolean
     domain?: boolean
+    maxAge?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6413,6 +6425,7 @@ export namespace Prisma {
     id?: boolean
     alias?: boolean
     domain?: boolean
+    maxAge?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6426,6 +6439,7 @@ export namespace Prisma {
     id?: boolean
     alias?: boolean
     domain?: boolean
+    maxAge?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6439,6 +6453,7 @@ export namespace Prisma {
     id?: boolean
     alias?: boolean
     domain?: boolean
+    maxAge?: boolean
     userId?: boolean
     isActive?: boolean
     emailCount?: boolean
@@ -6447,7 +6462,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type EmailAliasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "alias" | "domain" | "userId" | "isActive" | "emailCount" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAlias"]>
+  export type EmailAliasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "alias" | "domain" | "maxAge" | "userId" | "isActive" | "emailCount" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["emailAlias"]>
   export type EmailAliasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     emailLogs?: boolean | EmailAlias$emailLogsArgs<ExtArgs>
@@ -6472,6 +6487,7 @@ export namespace Prisma {
       id: string
       alias: string
       domain: string
+      maxAge: number
       userId: string
       isActive: boolean
       emailCount: number
@@ -6907,6 +6923,7 @@ export namespace Prisma {
     readonly id: FieldRef<"EmailAlias", 'String'>
     readonly alias: FieldRef<"EmailAlias", 'String'>
     readonly domain: FieldRef<"EmailAlias", 'String'>
+    readonly maxAge: FieldRef<"EmailAlias", 'Int'>
     readonly userId: FieldRef<"EmailAlias", 'String'>
     readonly isActive: FieldRef<"EmailAlias", 'Boolean'>
     readonly emailCount: FieldRef<"EmailAlias", 'Int'>
@@ -10689,6 +10706,7 @@ export namespace Prisma {
     id: 'id',
     alias: 'alias',
     domain: 'domain',
+    maxAge: 'maxAge',
     userId: 'userId',
     isActive: 'isActive',
     emailCount: 'emailCount',
@@ -11108,6 +11126,7 @@ export namespace Prisma {
     id?: StringFilter<"EmailAlias"> | string
     alias?: StringFilter<"EmailAlias"> | string
     domain?: StringFilter<"EmailAlias"> | string
+    maxAge?: IntFilter<"EmailAlias"> | number
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -11123,6 +11142,7 @@ export namespace Prisma {
     id?: SortOrder
     alias?: SortOrder
     domain?: SortOrder
+    maxAge?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -11141,6 +11161,7 @@ export namespace Prisma {
     OR?: EmailAliasWhereInput[]
     NOT?: EmailAliasWhereInput | EmailAliasWhereInput[]
     domain?: StringFilter<"EmailAlias"> | string
+    maxAge?: IntFilter<"EmailAlias"> | number
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -11156,6 +11177,7 @@ export namespace Prisma {
     id?: SortOrder
     alias?: SortOrder
     domain?: SortOrder
+    maxAge?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -11176,6 +11198,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"EmailAlias"> | string
     alias?: StringWithAggregatesFilter<"EmailAlias"> | string
     domain?: StringWithAggregatesFilter<"EmailAlias"> | string
+    maxAge?: IntWithAggregatesFilter<"EmailAlias"> | number
     userId?: StringWithAggregatesFilter<"EmailAlias"> | string
     isActive?: BoolWithAggregatesFilter<"EmailAlias"> | boolean
     emailCount?: IntWithAggregatesFilter<"EmailAlias"> | number
@@ -11702,6 +11725,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -11716,6 +11740,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -11730,6 +11755,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11744,6 +11770,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -11758,6 +11785,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -11770,6 +11798,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11781,6 +11810,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -12410,6 +12440,7 @@ export namespace Prisma {
     id?: SortOrder
     alias?: SortOrder
     domain?: SortOrder
+    maxAge?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -12419,6 +12450,7 @@ export namespace Prisma {
   }
 
   export type EmailAliasAvgOrderByAggregateInput = {
+    maxAge?: SortOrder
     emailCount?: SortOrder
   }
 
@@ -12426,6 +12458,7 @@ export namespace Prisma {
     id?: SortOrder
     alias?: SortOrder
     domain?: SortOrder
+    maxAge?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -12438,6 +12471,7 @@ export namespace Prisma {
     id?: SortOrder
     alias?: SortOrder
     domain?: SortOrder
+    maxAge?: SortOrder
     userId?: SortOrder
     isActive?: SortOrder
     emailCount?: SortOrder
@@ -12447,6 +12481,7 @@ export namespace Prisma {
   }
 
   export type EmailAliasSumOrderByAggregateInput = {
+    maxAge?: SortOrder
     emailCount?: SortOrder
   }
 
@@ -13175,6 +13210,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13188,6 +13224,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13312,6 +13349,7 @@ export namespace Prisma {
     id?: StringFilter<"EmailAlias"> | string
     alias?: StringFilter<"EmailAlias"> | string
     domain?: StringFilter<"EmailAlias"> | string
+    maxAge?: IntFilter<"EmailAlias"> | number
     userId?: StringFilter<"EmailAlias"> | string
     isActive?: BoolFilter<"EmailAlias"> | boolean
     emailCount?: IntFilter<"EmailAlias"> | number
@@ -13622,6 +13660,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13635,6 +13674,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -13664,6 +13704,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13677,6 +13718,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -13863,6 +13905,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -13876,6 +13919,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     userId: string
     isActive?: boolean
     emailCount?: number
@@ -13905,6 +13949,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13918,6 +13963,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     userId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
@@ -14059,6 +14105,7 @@ export namespace Prisma {
     id?: string
     alias: string
     domain?: string
+    maxAge?: number
     isActive?: boolean
     emailCount?: number
     expiresAt?: Date | string | null
@@ -14085,6 +14132,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14098,6 +14146,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14111,6 +14160,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     alias?: StringFieldUpdateOperationsInput | string
     domain?: StringFieldUpdateOperationsInput | string
+    maxAge?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     emailCount?: IntFieldUpdateOperationsInput | number
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

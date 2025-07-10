@@ -6,16 +6,16 @@ WORKDIR /app
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
-# Copy package files with better layer caching
+# Copy package files
 COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
 COPY shared/package.json ./shared/
 
-# Clean npm cache first to ensure we have space
-RUN npm cache clean --force
-
-# Install dependencies with specific flags to reduce space usage
-RUN npm install --no-optional --prefer-offline --progress=false --loglevel=error
+# Clean install with workaround for Rollup native optional dep issue
+RUN rm -rf node_modules package-lock.json && \
+    npm install --ignore-scripts && \
+    npm rebuild && \
+    npm install
 
 # Copy source files
 COPY shared ./shared
@@ -32,10 +32,14 @@ RUN rm -rf /app/node_modules/.cache
 FROM node:20-slim AS production
 WORKDIR /app
 
-# Install only production dependencies
+# Copy only needed files
 COPY package.json package-lock.json* ./
 COPY apps/ui/package.json ./apps/ui/
-RUN npm ci --only=production --no-optional --progress=false
+
+# Install production dependencies
+RUN rm -rf node_modules && \
+    npm ci --only=production --no-optional && \
+    npm rebuild
 
 # Copy built application
 COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
@@ -43,7 +47,7 @@ COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
 # Set working directory to the UI app
 WORKDIR /app/apps/ui
 
-# Create non-root user for security
+# Create non-root user
 RUN groupadd -g 1001 nodejs && useradd -r -u 1001 -g nodejs nextjs
 USER nextjs
 

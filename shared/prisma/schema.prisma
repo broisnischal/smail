@@ -117,7 +117,6 @@ model EmailAlias {
 
   domain String @default("snehaa.store")
 
-  isTemp Boolean @default(false)
   maxAge Int     @default(10)
 
   userId     String

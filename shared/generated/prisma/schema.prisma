@@ -117,6 +117,8 @@ model EmailAlias {
 
   domain String @default("snehaa.store")
 
+  maxAge Int @default(10)
+
   userId     String
   isActive   Boolean   @default(true)
   emailCount Int       @default(0)
