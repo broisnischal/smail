@@ -7,7 +7,7 @@ const getApiUrl = () => {
         return '/api'
     }
     // Server-side: use environment variable or fallback
-    return process.env.API_URL || 'http://localhost:3000/api'
+    return process.env.NODE_ENV === "production" ? process.env.API_URL! : 'http://localhost:3000/api'
 }
 
 export const upfetch = up(fetch, () => ({

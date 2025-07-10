@@ -111,7 +111,7 @@ const provider = new Elysia({})
         value: appToken,
       });
 
-      return redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/`);
+      return redirect(process.env.NODE_ENV === "production" ? process.env.CLIENT_URL! : 'http://localhost:3001');
     },
   );
 
