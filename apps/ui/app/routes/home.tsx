@@ -2,7 +2,7 @@ import { Button } from "~/components/ui/button"
 import { Toaster, toast } from 'sonner'
 
 import { Copy, Edit, Forward, Trash, Trash2 } from "lucide-react"
-import { Form, redirect } from "react-router"
+import { Form, redirect, redirectDocument } from "react-router"
 import z from 'zod'
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent } from "~/components/ui/card"
@@ -52,14 +52,18 @@ export async function action({ request }: Route.ActionArgs) {
   console.log(formData)
 
   if (formData.get("_action") === "login") {
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    const clientUrl = process.env.NODE_ENV === "production" ? process.env.API_URL! : 'http://localhost:3000';
     const baseUrl = clientUrl.replace(/\/$/, '');
 
-    return redirect(`${baseUrl}/api/auth/google`);
+    console.log(baseUrl)
+
+    return redirectDocument(`${baseUrl}/api/auth/google`);
   }
 
 
   if (formData.get('_action') === 'logout') {
+
+
     return redirect('/', {
       headers: {
         "Set-Cookie": "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=None; Secure"
@@ -142,7 +146,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function Home({ loaderData, actionData }: Route.ComponentProps) {
   return (
-    <div className="min-h-svh container  p-10">
+    <div className="min-h-svh   p-10">
       <Toaster />
 
 
@@ -169,10 +173,8 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
                   <p className="text-gray-600">Manage your email aliases and forwarding rules</p>
                   <Form method="post" >
                     <input type="hidden" name="_action" value="logout" />
-
                     <Button size={"sm"} className="cursor-pointer my-2" type="submit">Sign Out</Button>
                   </Form>
-
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
@@ -195,18 +197,14 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
                               <Button variant="ghost" size="sm" onClick={() => {
                                 navigator.clipboard.writeText(`${alias.alias}@${alias.domain}`)
                                 toast('Copied to clipboard')
-                                // alert("Copied to clipboard")
                               }}>
                                 <Copy className="h-4 w-4" />
                               </Button>
                             </div>
-                            <p className="text-gray-600 mb-1">
-                              <span className="font-medium">Forwards to:</span> {alias.email[0]?.address}
-                            </p>
-                            {/* {alias.description && <p className="text-sm text-gray-500 mb-2">{alias.description}</p>} */}
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
+
+                            <div className="flex flex-col gap-4 text-sm text-gray-500">
                               <span>{alias.emailCount} emails forwarded</span>
-                              <span>Created {alias.createdAt}</span>
+                              <span>Created {new Date(alias.createdAt).toLocaleDateString()}</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -238,11 +236,20 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 
 
         </div> : (
-          <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">Welcome to Broisnees Mail</h1>
+          <div className="flex flex-col justify-center items-center gap-4">
+
+            <h1 className="text-3xl font-bold">MailForwarder</h1>
+
+            <p className="text-gray-600 text-center max-w-md">
+              Manage your email aliases and forwarding rules,
+              Protect your privacy by creating disposable email aliases that forward to your real address. Never expose your actual email to services - create unique aliases for each one and maintain control over your inbox.
+            </p>
+
+
+
+
             <Form method="post" navigate={true}>
               <input type="hidden" name="_action" value="login" />
-
               <Button className="cursor-pointer" type="submit">Sign In with Google</Button>
             </Form>
           </div>

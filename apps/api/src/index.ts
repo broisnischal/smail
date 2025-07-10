@@ -13,7 +13,7 @@ const app = new Elysia({ prefix: "/api" }).use(cors({
   origin: [
     process.env.CLIENT_URL || "http://localhost:5173",
     "http://localhost:3000",
-    "https://mail.snehaa.store"
+    "https://temp.snehaa.store"
   ],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
