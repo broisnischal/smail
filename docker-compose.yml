@@ -12,8 +12,8 @@ services:
     working_dir: /app/shared/prisma
     command: |
       sh -c "
-        bunx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
-        bunx prisma generate --schema=/app/shared/prisma/schema.prisma
+        npx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
+        npx prisma generate --schema=/app/shared/prisma/schema.prisma
       "
     networks:
       - snehaa-network
@@ -96,7 +96,7 @@ services:
       - ./cloudflare.crt:/etc/certs/cloudflare.crt
       - ./cloudflare.key:/etc/certs/cloudflare.key
     depends_on:
-      - api 
+      - api
       - ui
     networks:
       - snehaa-network
@@ -104,4 +104,3 @@ services:
 networks:
   snehaa-network:
     driver: bridge
-  

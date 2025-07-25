@@ -7,14 +7,11 @@
     "shared"
   ],
   "scripts": {
-    "dev": "docker-compose up",
-    "build": "docker-compose build",
-    "start": "docker-compose up",
-    "stop": "docker-compose down",
-    "clean": "docker-compose down -v",
-    "prisma:generate": "cd shared && bunx prisma generate",
-    "prisma:migrate": "cd shared && bunx prisma migrate dev",
-    "prisma:studio": "cd shared && bunx prisma studio"
+    "start": "react-router-serve build/server/index.js",
+    "build": "cd apps/ui && npm run build",
+    "prisma:generate": "cd shared && npm prisma generate",
+    "prisma:migrate": "cd shared && npm prisma migrate dev",
+    "prisma:studio": "cd shared && npm prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
