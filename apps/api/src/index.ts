@@ -1,26 +1,20 @@
 import { Elysia, t } from "elysia";
 import provider from "./api/provider";
 import { JwtPayload, verify } from "jsonwebtoken";
-import cors from "@elysiajs/cors";
+import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
 import { db } from "./db";
+import { PrismaClient } from "../../../shared/generated/prisma";
 
 type AppTokenPayload = JwtPayload & {
   email: string;
   provider: string;
 };
 
-const app = new Elysia({ prefix: "/api" })
-  .use(
-    cors({
-      origin: [
-        process.env.CLIENT_URL || "http://localhost:5173",
-        "http://localhost:3000",
-        "https://temp.snehaa.store",
-      ],
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
-    }),
-  )
+const app = new Elysia()
+  .use(swagger())
+
+  .decorate("db", new PrismaClient())
   .decorate("db", db)
   .onBeforeHandle(({ cookie }) => {
     // console.log(cookie)
@@ -64,6 +58,15 @@ const app = new Elysia({ prefix: "/api" })
       return { user: null };
     }
   })
+  // .use(
+  //   cors({
+  //     origin: "*",
+  //     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  //     allowedHeaders: ["Content-Type", "Authorization"],
+  //     exposedHeaders: ["Content-Type", "Authorization"],
+  //     credentials: true,
+  //   }),
+  // )
   .get("/me", async ({ user, db }) => {
     if (!user) {
       throw new Error("Unauthorized");
@@ -201,6 +204,7 @@ const app = new Elysia({ prefix: "/api" })
       password: t.String(),
     }),
   })
+
   .listen(4000);
 
 console.log(
