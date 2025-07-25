@@ -1,4 +1,15 @@
-.react-router
-build
 node_modules
+npm-debug.log
+.git
+.gitignore
 README.md
+.env
+.nyc_output
+coverage
+.cache
+dist
+build
+.DS_Store
+*.log
+.vscode
+.idea

@@ -5,4 +5,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  server: {
+    port: 3001,
+    cors: {
+      origin: "http://localhost:3000",
+      credentials: true,
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }
+  }
 });

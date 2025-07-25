@@ -1,17 +1,18 @@
 import Elysia, { Context, redirect } from "elysia";
 import { oauth2 } from "elysia-oauth2";
-import { PrismaClient } from "../../../../generated/prisma";
 import { sign } from "jsonwebtoken";
+import { db } from "../db";
+import { PrismaClient } from "../../../../shared/generated/prisma";
 
 const provider = new Elysia({})
-  .decorate("db", new PrismaClient())
+  .decorate("db", db)
   .use(
     oauth2(
       {
         Google: [
           "368826759806-rglob2arlkv1cfiqbg99bocltqsgbkjs.apps.googleusercontent.com",
-          "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",
-          "http://localhost:3000/auth/google/callback",
+          "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",
+          process.env.NODE_ENV === "production" ? `${process.env.API_URL}/auth/google/callback` : 'http://localhost:3000/api/auth/google/callback',
         ],
       },
       {
@@ -101,15 +102,16 @@ const provider = new Elysia({})
       );
 
       token.set({
+        domain: process.env.CLIENT_URL ? new URL(process.env.CLIENT_URL).hostname : 'localhost',
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         httpOnly: true,
         path: "/",
         sameSite: "lax",
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         value: appToken,
       });
 
-      return redirect("/me");
+      return redirect(process.env.NODE_ENV === "production" ? process.env.CLIENT_URL! : 'http://localhost:3001');
     },
   );
 

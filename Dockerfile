@@ -1,22 +1,38 @@
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
+FROM oven/bun:1.0.36 as builder
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-  openssl \
-  && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Copy package files
+# Copy all necessary files for workspaces
 COPY package.json bun.lock ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/smtp/package.json ./apps/smtp/
+COPY apps/ui/package.json ./apps/ui/
+COPY shared/package.json ./shared/
+
+# Copy source files
+COPY shared ./shared
+COPY apps/api ./apps/api
+COPY apps/smtp ./apps/smtp
+COPY apps/ui ./apps/ui
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
-# Copy prisma and generated files
-COPY prisma ./prisma
-COPY generated ./generated
+# Generate Prisma client with correct binary targets
+WORKDIR /app/shared
+RUN bunx prisma generate --schema=./prisma/schema.prisma
 
-# Generate Prisma client
-RUN bunx prisma generate
+# Production image
+FROM oven/bun:1.0.36-slim
 
+WORKDIR /app
+
+# Copy only what's needed for migrations
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/node_modules ./node_modules
+
+# Set working directory for migrations
+WORKDIR /app/shared/prisma
+
+# Default command (can be overridden by docker-compose)
 CMD ["bunx", "prisma", "migrate", "deploy"]

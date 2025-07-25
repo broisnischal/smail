@@ -1,21 +1,41 @@
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
+FROM oven/bun:1.0.36 as builder
 
-# Copy root package files
+WORKDIR /app
+
+# Copy only necessary package files
 COPY package.json bun.lock ./
-COPY apps/smtp/package.json apps/smtp/bun.lock* ./apps/smtp/
+COPY apps/smtp/package.json ./apps/smtp/
+COPY shared/package.json ./shared/
 
-# Install root dependencies
-RUN bun install --frozen-lockfile
+# Copy only necessary source files
+COPY shared ./shared
+COPY apps/smtp ./apps/smtp
 
-# Install SMTP dependencies
-WORKDIR /usr/src/app/apps/smtp
-RUN bun install --frozen-lockfile
+# Install dependencies
+RUN bun install
 
-# Copy SMTP source code
-COPY apps/smtp/index.ts ./
+# Generate Prisma client with correct binary targets
+WORKDIR /app/shared
+RUN bunx prisma generate --schema=./prisma/schema.prisma
 
-WORKDIR /usr/src/app/apps/smtp
+# Production image
+FROM oven/bun:1.0.36-slim
 
-EXPOSE 2525
+WORKDIR /app
+
+# Copy everything we need from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/smtp ./apps/smtp
+COPY --from=builder /app/shared/generated/prisma ./shared/generated/prisma
+
+# Create directory for database
+RUN mkdir -p /app/shared/prisma
+
+# Set working directory to the SMTP app
+WORKDIR /app/apps/smtp
+
+# Expose the SMTP port
+EXPOSE 25
+
+# Start the application
 CMD ["bun", "run", "index.ts"]

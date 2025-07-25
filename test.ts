@@ -2,8 +2,8 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "mail.a.aitchomes.com",
-  port: 2525,
+  host: "mail.snehaa.store",
+  port: 25,
   secure: false,
 });
 

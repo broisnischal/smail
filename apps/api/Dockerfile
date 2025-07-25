@@ -1,29 +1,41 @@
-FROM oven/bun:1 as base
-WORKDIR /usr/src/app
+FROM oven/bun:1.0.36 as builder
 
-# Copy root package files
+WORKDIR /app
+
+# Copy only necessary package files
 COPY package.json bun.lock ./
-COPY apps/api/package.json apps/api/bun.lock* ./apps/api/
+COPY apps/api/package.json ./apps/api/
+COPY shared/package.json ./shared/
 
-# Install root dependencies first
-RUN bun install --frozen-lockfile
+# Copy only necessary source files
+COPY shared ./shared
+COPY apps/api ./apps/api
 
-# Copy shared libraries
-COPY apps/lib ./apps/lib
+# Install dependencies
+RUN bun install
 
-# Install API dependencies
-WORKDIR /usr/src/app/apps/api
-RUN bun install --frozen-lockfile
+# Generate Prisma client with correct binary targets
+WORKDIR /app/shared
+RUN bunx prisma generate --schema=./prisma/schema.prisma
 
-# Copy API source code
-COPY apps/api/src ./src
-COPY apps/api/tsconfig.json ./
+# Production image
+FROM oven/bun:1.0.36-slim
 
-# Copy generated Prisma client and schema
-COPY generated /usr/src/app/generated
-COPY prisma /usr/src/app/prisma
+WORKDIR /app
 
-WORKDIR /usr/src/app/apps/api
+# Copy everything we need from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/api ./apps/api
+COPY --from=builder /app/shared/generated/prisma ./shared/generated/prisma
 
+# Create directory for database
+RUN mkdir -p /app/shared/prisma
+
+# Set working directory to the API app
+WORKDIR /app/apps/api
+
+# Expose the port the app runs on
 EXPOSE 3000
+
+# Start the application
 CMD ["bun", "run", "src/index.ts"]

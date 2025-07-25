@@ -1,0 +1,40 @@
+FROM node:20-alpine AS development-dependencies-env
+WORKDIR /app
+
+# Copy root package files first
+COPY package.json package-lock.json* ./
+COPY apps/ui/package.json ./apps/ui/
+COPY shared/package.json ./shared/
+
+# Install root dependencies first
+RUN npm install
+
+# Explicitly install the missing Rollup native dependency
+RUN npm install @rollup/rollup-linux-x64-musl
+
+# Copy source files
+COPY shared ./shared
+COPY apps/ui ./apps/ui
+
+# Build the UI
+WORKDIR /app/apps/ui
+RUN npm run build
+
+# Production image
+FROM node:20-alpine
+WORKDIR /app
+
+# Copy only what's needed for production
+COPY package.json package-lock.json* ./
+COPY apps/ui/package.json ./apps/ui/
+COPY --from=development-dependencies-env /app/node_modules ./node_modules
+COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
+
+# Set working directory to the UI app
+WORKDIR /app/apps/ui
+
+# Expose the port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "run", "start"]

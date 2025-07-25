@@ -1,0 +1,58 @@
+# Use Debian-based image instead of Alpine for better compatibility with native modules
+FROM node:20-slim AS development-dependencies-env
+WORKDIR /app
+
+# Set npm cache directory and increase max memory
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# Copy package files
+COPY package.json package-lock.json* ./
+COPY apps/ui/package.json ./apps/ui/
+COPY shared/package.json ./shared/
+
+# Clean install with workaround for Rollup native optional dep issue
+RUN rm -rf node_modules package-lock.json && \
+    npm install --ignore-scripts && \
+    npm rebuild && \
+    npm install
+
+# Copy source files
+COPY shared ./shared
+COPY apps/ui ./apps/ui
+
+# Build the UI
+WORKDIR /app/apps/ui
+RUN npm run build
+
+# Clean up node_modules after build to save space
+RUN rm -rf /app/node_modules/.cache
+
+# Production image
+FROM node:20-slim AS production
+WORKDIR /app
+
+# Copy only needed files
+COPY package.json package-lock.json* ./
+COPY apps/ui/package.json ./apps/ui/
+
+# Install production dependencies
+RUN rm -rf node_modules && \
+    npm ci --only=production --no-optional && \
+    npm rebuild
+
+# Copy built application
+COPY --from=development-dependencies-env /app/apps/ui/build ./apps/ui/build
+
+# Set working directory to the UI app
+WORKDIR /app/apps/ui
+
+# Create non-root user
+RUN groupadd -g 1001 nodejs && useradd -r -u 1001 -g nodejs nextjs
+USER nextjs
+
+# Expose the port
+EXPOSE 3000
+
+# Start the application
+CMD ["npm", "run", "start"]

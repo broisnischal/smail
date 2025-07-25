@@ -3,15 +3,19 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "prisma:generate": "bunx prisma generate"
   },
   "dependencies": {
     "@bogeychan/elysia-oauth2": "^0.1.0",
     "@elysiajs/swagger": "^1.3.0",
+    "@elysiajs/cors": "^1.3.3",
     "arctic": "^3.7.0",
     "elysia": "latest",
     "elysia-oauth2": "^2.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "@prisma/client": "^6.9.0"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.9",

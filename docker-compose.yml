@@ -1,74 +1,107 @@
-
 services:
-  # Database
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_DB: myapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # Migration service
   migrate:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DATABASE_URL: "file:./prisma/dev.db"
+    volumes:
+      - ./shared/prisma:/app/shared/prisma
+    working_dir: /app/shared/prisma
     command: |
       sh -c "
-        echo 'Running migrations...' &&
-        bunx prisma migrate deploy &&
-        echo 'Seeding database...' &&
-        bun run prisma/seed.ts
+        bunx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
+        bunx prisma generate --schema=/app/shared/prisma/schema.prisma
       "
+    networks:
+      - snehaa-network
 
-  # API service
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/myapp
-      PORT: 3000
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+      API_URL: ${API_URL:-http://localhost:3000/api}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL:-file:./prisma/dev.db}
     ports:
       - "3000:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
+    volumes:
+      - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
-  # SMTP service
   smtp:
     build:
       context: .
       dockerfile: apps/smtp/Dockerfile
+    env_file:
+      - .env
     environment:
-      SMTP_PORT: 2525
+      SMTP_PORT: 25
+      GMAIL_USER: ${GMAIL_USER:-nischalm3pro@gmail.com}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL:-file:./prisma/dev.db}
+      API_URL: ${API_URL:-http://localhost:3000/api}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+    cap_add:
+      - NET_BIND_SERVICE
     ports:
-      - "2525:2525"
+      - "25:25"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./shared/prisma:/app/shared/prisma
     restart: unless-stopped
+    networks:
+      - snehaa-network
 
-  # UI service
-  # ui:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/ui/Dockerfile
-  #   ports:
-  #     - "5173:5173"
-  #   restart: unless-stopped
+  ui:
+    build:
+      context: .
+      dockerfile: apps/ui/Dockerfile.node
+    env_file:
+      - .env
+    environment:
+      API_URL: ${API_URL:-http://localhost:3000/api}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+    ports:
+      - "5173:3001"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - snehaa-network
 
-volumes:
-  postgres_data:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./cloudflare.crt:/etc/certs/cloudflare.crt
+      - ./cloudflare.key:/etc/certs/cloudflare.key
+    depends_on:
+      - api 
+      - ui
+    networks:
+      - snehaa-network
+
+networks:
+  snehaa-network:
+    driver: bridge
+  

@@ -1,9 +1,28 @@
 import { SMTPServer } from "smtp-server";
 import { simpleParser } from "mailparser";
-import { PrismaClient, SubscriptionStatus } from "../../generated/prisma";
 import * as nodemailer from "nodemailer";
+import { PrismaClient } from "../../shared/generated/prisma";
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
 
 const prisma = new PrismaClient();
+
+// Create a reusable transporter with the exact same config as the working test
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Use SSL
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+    // Use the exact same timeout settings as the working test
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
+};
 
 const server = new SMTPServer({
   secure: false,
@@ -138,6 +157,9 @@ async function handleIncomingMail(mail: any, session: any) {
   try {
     console.log(`📧 Processing email for: ${recipient}`);
 
+    console.log(process.env.GMAIL_USER);
+    console.log(process.env.GMAIL_APP_PASSWORD);
+
     const alias = await prisma.emailAlias.findFirst({
       where: { alias: recipient.split("@")[0], isActive: true },
       include: { user: true },
@@ -195,13 +217,7 @@ async function forwardEmail(
   forwardTo: string,
   originalRecipient: string,
 ) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
+  const transporter = createTransporter();
 
   try {
     // Extract original sender info with proper null checks
@@ -237,8 +253,8 @@ To: ${originalRecipient}
             <strong>---------- Forwarded message ---------</strong><br>
             <strong>From:</strong> ${originalFrom}<br>
             <strong>Date:</strong> ${new Date(
-              originalDate,
-            ).toLocaleString()}<br>
+        originalDate,
+      ).toLocaleString()}<br>
             <strong>Subject:</strong> ${originalSubject}<br>
             <strong>To:</strong> ${originalRecipient}
           </p>
@@ -254,8 +270,8 @@ To: ${originalRecipient}
             <strong>---------- Forwarded message ---------</strong><br>
             <strong>From:</strong> ${originalFrom}<br>
             <strong>Date:</strong> ${new Date(
-              originalDate,
-            ).toLocaleString()}<br>
+        originalDate,
+      ).toLocaleString()}<br>
             <strong>Subject:</strong> ${originalSubject}<br>
             <strong>To:</strong> ${originalRecipient}
           </p>
@@ -305,6 +321,7 @@ To: ${originalRecipient}
       headers: customHeaders,
     };
 
+    console.log(`📤 Sending email to: ${forwardTo}`);
     const result = await transporter.sendMail(mailOptions);
     console.log(`✅ Email forwarded to ${forwardTo}:`, result.messageId);
 
@@ -321,19 +338,29 @@ To: ${originalRecipient}
 
     return result;
   } catch (error) {
-    console.error("Error forwarding email:", error);
+    console.error("❌ Error forwarding email:", error);
+
+    // Provide more specific error information
+    if (error.code === 'EAUTH') {
+      console.error("🔐 Authentication failed. Check Gmail credentials and App Password.");
+    } else if (error.code === 'ETIMEDOUT') {
+      console.error("⏰ Connection timeout. Check network connectivity and firewall settings.");
+    } else if (error.code === 'ECONNECTION') {
+      console.error("🌐 Connection failed. Check internet connectivity.");
+    } else if (error.code === 'ESOCKET') {
+      console.error("🔌 Socket error. Check network configuration.");
+    }
+
     throw error;
   }
 }
 
 const PORT = process.env.NODE_ENV === "production" ? 25 : 2525;
 
-// Simple server startup like your working version
-server.listen(25, () => {
-  console.log("🚀 SMTP Server listening on port 25");
+server.listen(PORT, () => {
+  console.log("🚀 SMTP Server listening on port " + PORT);
 });
 
-// Graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("🛑 Received SIGTERM, shutting down gracefully...");
   await prisma.$disconnect();
