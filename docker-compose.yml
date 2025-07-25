@@ -1,106 +1,159 @@
 services:
+  # ───────────────────────────────────────────────────────────────────────────────
+  # Database Migration Service
+  # ───────────────────────────────────────────────────────────────────────────────
   migrate:
     build:
       context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
+      dockerfile: Dockerfile.migrate
+    env_file: .env
     environment:
-      DATABASE_URL: "file:./prisma/dev.db"
+      DATABASE_URL: ${DATABASE_URL:-file:/app/data/dev.db}
     volumes:
-      - ./shared/prisma:/app/shared/prisma
+      - ./shared/prisma:/app/shared/prisma:ro
+      - db_data:/app/data
     working_dir: /app/shared/prisma
-    command: |
-      sh -c "
-        npx prisma migrate deploy --schema=/app/shared/prisma/schema.prisma &&
-        npx prisma generate --schema=/app/shared/prisma/schema.prisma
-      "
     networks:
       - snehaa-network
+    restart: "no"  # Migration should run once and exit
 
+  # ───────────────────────────────────────────────────────────────────────────────
+  # API Service
+  # ───────────────────────────────────────────────────────────────────────────────
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    env_file:
-      - .env
+      # target: runtime
+    env_file: .env
     environment:
       CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
       API_URL: ${API_URL:-http://localhost:3000/api}
       JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: ${DATABASE_URL:-file:./prisma/dev.db}
+      DATABASE_URL: ${DATABASE_URL:-file:/app/data/dev.db}
+      NODE_ENV: production
     ports:
-      - "3000:3000"
+      - "${API_PORT:-3000}:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
     volumes:
-      - ./shared/prisma:/app/shared/prisma
+      - db_data:/app/data
     restart: unless-stopped
     networks:
       - snehaa-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ───────────────────────────────────────────────────────────────────────────────
+  # SMTP Service
+  # ───────────────────────────────────────────────────────────────────────────────
   smtp:
     build:
       context: .
       dockerfile: apps/smtp/Dockerfile
-    env_file:
-      - .env
+      # target: runtime
+    env_file: .env
     environment:
       SMTP_PORT: 25
       GMAIL_USER: ${GMAIL_USER:-nischalm3pro@gmail.com}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
-      DATABASE_URL: ${DATABASE_URL:-file:./prisma/dev.db}
-      API_URL: ${API_URL:-http://localhost:3000/api}
+      DATABASE_URL: ${DATABASE_URL:-file:/app/data/dev.db}
+      API_URL: ${API_URL:-http://api:3000/api}  # Use service name for internal communication
       RESEND_API_KEY: ${RESEND_API_KEY}
+      NODE_ENV: production
     cap_add:
       - NET_BIND_SERVICE
     ports:
-      - "25:25"
+      - "${SMTP_PORT:-25}:25"
     depends_on:
       migrate:
         condition: service_completed_successfully
+      api:
+        condition: service_healthy
     volumes:
-      - ./shared/prisma:/app/shared/prisma
+      - db_data:/app/data
     restart: unless-stopped
     networks:
       - snehaa-network
 
+  # ───────────────────────────────────────────────────────────────────────────────
+  # UI Service
+  # ───────────────────────────────────────────────────────────────────────────────
   ui:
     build:
       context: .
-      dockerfile: apps/ui/Dockerfile.node
-    env_file:
-      - .env
+      dockerfile: apps/ui/Dockerfile
+      # target: runtime
+    env_file: .env
     environment:
-      API_URL: ${API_URL:-http://localhost:3000/api}
+      API_URL: ${API_URL:-http://api:3000/api}  # Use service name for internal communication
       CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+      NODE_ENV: production
     ports:
-      - "5173:3001"
+      - "${UI_PORT:-5173}:3001"
     depends_on:
       migrate:
         condition: service_completed_successfully
+      api:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - snehaa-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # ───────────────────────────────────────────────────────────────────────────────
+  # Reverse Proxy
+  # ───────────────────────────────────────────────────────────────────────────────
   caddy:
-    image: caddy:2
+    image: caddy:2-alpine
     container_name: caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./cloudflare.crt:/etc/certs/cloudflare.crt
-      - ./cloudflare.key:/etc/certs/cloudflare.key
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs/cloudflare.crt:/etc/certs/cloudflare.crt:ro
+      - ./certs/cloudflare.key:/etc/certs/cloudflare.key:ro
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
-      - api
-      - ui
+      api:
+        condition: service_healthy
+      ui:
+        condition: service_healthy
     networks:
       - snehaa-network
+    environment:
+      - CADDY_ADMIN=0.0.0.0:2019
 
+# ───────────────────────────────────────────────────────────────────────────────
+# Volumes for data persistence
+# ───────────────────────────────────────────────────────────────────────────────
+volumes:
+  db_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+
+# ───────────────────────────────────────────────────────────────────────────────
+# Networks
+# ───────────────────────────────────────────────────────────────────────────────
 networks:
   snehaa-network:
     driver: bridge
+    # ipam:
+    #   config:
+    #     - subnet: 172.20.0.0/16

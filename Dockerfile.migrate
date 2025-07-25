@@ -1,0 +1,111 @@
+# ───────────────────────────────────────────────────────────────────────────────
+# Single-stage migration container
+# ───────────────────────────────────────────────────────────────────────────────
+FROM node:20-alpine
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+COPY shared/package.json ./shared/
+
+# Install dependencies
+RUN npm ci
+
+# Copy shared source files
+COPY shared ./shared
+
+# Generate Prisma client
+WORKDIR /app/shared
+RUN npx prisma generate --schema=./prisma/schema.prisma
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Set working directory for migrations
+WORKDIR /app/shared/prisma
+
+# Simple command without script
+CMD ["sh", "-c", "echo 'Starting migration...' && npx prisma migrate deploy && echo 'Migration completed'"]
+
+# # ───────────────────────────────────────────────────────────────────────────────
+# # Stage 1: Install dependencies
+# # ───────────────────────────────────────────────────────────────────────────────
+# FROM node:20-alpine AS builder
+# WORKDIR /app
+
+# # Install OpenSSL for Prisma
+# RUN apk add --no-cache openssl
+
+# # Copy package files for workspace resolution
+# COPY package.json package-lock.json ./
+# COPY shared/package.json ./shared/
+# COPY apps/*/package.json ./apps/*/
+
+# # Install dependencies
+# RUN npm install --legacy-peer-deps
+# #ci
+
+# # Copy application source files
+# # COPY apps/api ./apps/api
+# # COPY apps/smtp ./apps/smtp
+# # COPY apps/ui ./apps/ui
+# # # Ensure the shared directory exists
+# # RUN mkdir -p ./shared
+# # # Copy only the necessary shared source files
+# # COPY shared/package.json ./shared/
+# # COPY shared/prisma ./shared/prisma
+
+# # Copy shared source files (especially Prisma schema)
+# COPY shared ./shared
+
+# # Generate Prisma client
+# WORKDIR /app/shared
+# RUN npx prisma generate --schema=./prisma/schema.prisma
+
+# # ───────────────────────────────────────────────────────────────────────────────
+# # Stage 2: Migration runner
+# # ───────────────────────────────────────────────────────────────────────────────
+# FROM node:20-alpine AS runner
+
+# # Install OpenSSL for Prisma
+# RUN apk add --no-cache openssl
+
+# # Create data directory with proper permissions
+# RUN mkdir -p /app/data && chown -R node:node /app/data
+
+# WORKDIR /app
+
+# # Copy built dependencies and generated Prisma client
+# COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+# COPY --from=builder --chown=node:node /app/shared ./shared
+# COPY --from=builder --chown=node:node /app/package.json ./
+
+# # Switch to non-root user
+# USER node
+
+# # Set working directory for Prisma commands
+# WORKDIR /app/shared/prisma
+
+# # Create initialization script
+# RUN echo '#!/bin/sh\n\
+#   set -e\n\
+#   echo "Starting database migration..."\n\
+#   echo "Database URL: $DATABASE_URL"\n\
+#   \n\
+#   # Ensure data directory exists\n\
+#   mkdir -p /app/data\n\
+#   \n\
+#   # Run migrations\n\
+#   npx prisma migrate deploy --schema=./schema.prisma\n\
+#   \n\
+#   # Generate Prisma client (in case of version mismatch)\n\
+#   npx prisma generate --schema=./schema.prisma\n\
+#   \n\
+#   echo "Migration completed successfully"\n\
+#   ' > /app/migrate.sh && chmod +x /app/migrate.sh
+
+# CMD ["/bin/sh", "/app/migrate.sh"]
